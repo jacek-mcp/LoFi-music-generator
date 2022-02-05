@@ -3,3 +3,5 @@ music21~=7.1.0
 matplotlib~=3.5.1
 mido~=1.2.10
 keras~=2.7.0
+pandas~=1.4.0
+torch~=1.10.2
