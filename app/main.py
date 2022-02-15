@@ -428,7 +428,11 @@ def create_midi_notes_velocity_chords(prediction_output, chord_output, inst, str
     song.insert(0, midi_stream_chord)
 
     midi_path = 'drive/MyDrive/UPC-Project/music_generated/Model_chord_and_notes_velocity_{}.mid'.format(string)
-
+   
+    # Save Separated Chords and Notes tracks, as we will need different instruments SoundFonts for each.
+    midi_stream.write('midi',fp=midi_path[:-4]+"_notes.mid") 
+    midi_stream_chord.write('midi',fp=midi_path[:-4]+"_chords.mid")
+    
     song.write('midi', fp=midi_path)
 
     return output_notes, song, temp
