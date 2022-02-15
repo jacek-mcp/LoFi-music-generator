@@ -1,359 +1,314 @@
-import glob
 import pickle
-from fractions import Fraction
 
-import numpy
-import pandas as pd
 import numpy as np
-from music21 import converter, instrument, note, chord
 import torch
-import matplotlib.pyplot as plt
 import torch.nn.functional as F
-from google.colab import drive
-from app.model.LSTM_Torch_model import LSTM
-
-duration_list_full = []
-velocity_list_full = []
-position_list_full = []
-notes_list_full = []
-bins = np.array([0.0, 0.25, 0.50, 0.75, 1.0])
-centers = (bins[1:] + bins[:-1]) / 2
-
-# for file in glob.glob("ff_midi/ff7tifa.mid"):
-for file in glob.glob("drive/MyDrive/UPC-Project/blues/*.mid"):
-    notes = []
-
-    midi = converter.parse(file)
-
-    print("Parsing %s" % file)
-
-    notes_to_parse = None
-
-    try:
-        s2 = instrument.partitionByInstrument(midi)
-        notes_to_parse = s2.parts[0].recurse()
-
-    except:  # file has notes in a flat structure
-        notes_to_parse = midi.flat.notes
-
-    for position, element in enumerate(notes_to_parse[:]):
-        if isinstance(element, note.Note):
-            notes.append(
-                [str(element.pitch), str(element.duration).split()[1].replace(">", ""), str(element.volume.velocity),
-                 str(bins[np.digitize(round(position / len(notes_to_parse[:]), 1), centers)])])
-        elif isinstance(element, chord.Chord):
-            notes.append(
-                ['.'.join(str(n) for n in element.normalOrder), str(element.duration).split()[1].replace(">", ""),
-                 str(element.volume.velocity),
-                 str(bins[np.digitize(round(position / len(notes_to_parse[:]), 1), centers)])])
-
-    notes_list = [[item[0] for item in notes]]
-    try:
-        duration_list = [[float((Fraction(item[1]).numerator / Fraction(item[1]).denominator)) for item in notes]]
-    except:
-        try:
-            duration_list = [[float(item[1]) for item in notes]]
-        except:
-            duration_list = [[item[1] for item in notes]]
-    velocity_list = [[float(item[2]) for item in notes]]
-    position_list = [[float(item[3]) for item in notes]]
-
-    notes_list_full.append(notes_list)
-    duration_list_full.append(duration_list)
-    velocity_list_full.append(velocity_list)
-    position_list_full.append(position_list)
-
-    velocity_df = []
-    for x in velocity_list_full:
-        velocity_df.append(x[0])
-    pd.DataFrame(velocity_df)
-    vel_mean = []
-    vel_min = []
-    vel_max = []
-
-    for col in pd.DataFrame(velocity_df).columns:
-        vel_mean.append(pd.DataFrame(velocity_df)[col].mean())
-        vel_min.append(pd.DataFrame(velocity_df)[col].min())
-        vel_max.append(pd.DataFrame(velocity_df)[col].max())
-
-    velocity_df_metrics = pd.DataFrame([vel_mean, vel_min, vel_max]).T
-    velocity_df_metrics.columns = ["mean", "min", "max"]
-
-velocity_df = []
-
-for x in velocity_list_full:
-    velocity_df.append(x[0])
-
-pd.DataFrame(velocity_df)
-vel_mean = []
-vel_min = []
-vel_max = []
-
-for col in pd.DataFrame(velocity_df).columns:
-    vel_mean.append(pd.DataFrame(velocity_df)[col].mean())
-    vel_min.append(pd.DataFrame(velocity_df)[col].min())
-    vel_max.append(pd.DataFrame(velocity_df)[col].max())
-
-velocity_df_metrics = pd.DataFrame([vel_mean, vel_min, vel_max]).T
-velocity_df_metrics.columns = ["mean", "min", "max"]
-
-duration_df = []
-for x in duration_list_full:
-    duration_df.append(x[0])
-
-dur_mean = []
-dur_min = []
-dur_max = []
-
-for col in pd.DataFrame(duration_df).columns:
-    try:
-        dur_mean.append(pd.DataFrame(duration_df)[col].mean())
-        dur_min.append(pd.DataFrame(duration_df)[col].min())
-        dur_max.append(pd.DataFrame(duration_df)[col].max())
-    except:
-        pass
-
-duration_df_metrics = pd.DataFrame([dur_mean, dur_min, dur_max]).T
-duration_df_metrics.columns = ["mean", "min", "max"]
-
-fig, ax = plt.subplots()
-fig.set_size_inches(25, 15)
-
-for i in ["mean"]:
-    # ax.plot(foc_distro[foc_distro.order_discrepancy==f].day, foc_distro[
-    # foc_distro.order_discrepancy==f].customers_share, label=f)
-    ax.plot(duration_df_metrics[i], label=i)
-
-ax.legend(loc='best')
-plt.title("Duration Distribution along 100 Anime Songs")
-plt.ylim(0, 4)
-plt.xlabel("TimeStep")
-plt.ylabel("Total Duration")
-# pd.Series(vel_mean).plot()
-
-fig, ax = plt.subplots()
-fig.set_size_inches(25, 15)
-
-for i in ["mean", "min", "max"]:
-    # ax.plot(foc_distro[foc_distro.order_discrepancy==f].day, foc_distro[
-    # foc_distro.order_discrepancy==f].customers_share, label=f)
-    ax.plot(velocity_df_metrics[i], label=i)
-
-ax.legend(loc='best')
-plt.title("Velocity Distribution along 100 Anime Songs")
-plt.xlabel("TimeStep")
-plt.ylabel("Total Velocity")
-# pd.Series(vel_mean).plot()
-
-fig, ax = plt.subplots()
-fig.set_size_inches(25, 15)
-for i in range(0, 20):
-    # ax.plot(foc_distro[foc_distro.order_discrepancy==f].day, foc_distro[
-    # foc_distro.order_discrepancy==f].customers_share, label=f)
-    ax.plot(pd.Series(velocity_list_full[i][0]), label=i)
-ax.set_xlabel("timestep")
-ax.set_ylabel("duration / velocity")
-ax.legend(loc='best')
-plt.xlim(0, 60)
-plt.xticks(rotation=90)
-plt.title("Velocity / Duration distribution")
-plt.show()
-
-
-def get_notes_v2():
-    """ Get all the notes and chords from the midi files in the ./midi_songs directory """
-    notes = []
-
-    # positional bins
-    bins = np.array([0.0, 0.25, 0.50, 0.75, 1.0])
-    centers = (bins[1:] + bins[:-1]) / 2
-
-    # for file in glob.glob("ff_midi/ff7tifa.mid"):
-    for file in glob.glob("drive/MyDrive/UPC-Project/anime/anime/*.mid"):
-        # for file in glob.glob("anime/anime/*.mid"):
-
-        midi = converter.parse(file)
-
-        print("Parsing %s" % file)
 
-        notes_to_parse = None
 
-        try:  # file has instrument parts
-            s2 = instrument.partitionByInstrument(midi)
-            # for i in range(0,len(s2.parts)):
-            # if s2.parts[i].partName == "Flute":
-            # notes_to_parse = s2.parts[i].recurse()
-            # print(notes_to_parse)
-            notes_to_parse = s2.parts[0].recurse()
-
-            # print(notes_to_parse)
-        except:  # file has notes in a flat structure
-            notes_to_parse = midi.flat.notes
-
-        for position, element in enumerate(notes_to_parse[:]):
-
-            if isinstance(element, note.Note):
-                notes.append([str(element.pitch), str(element.duration).split()[1].replace(">", ""),
-                              str(element.volume.velocity)])  # ,str(bins[np.digitize(round(position/len(notes_to_parse[:]),1) , centers)])
-            if isinstance(element, chord.Chord):
-                notes.append(
-                    ['.'.join(str(n) for n in element.normalOrder), str(element.duration).split()[1].replace(">", ""),
-                     str(element.volume.velocity), ])  # ,str(bins[np.digitize(round(position/len(notes_to_parse[:]),1) , centers)])
-            if isinstance(element, note.Rest):
-                notes.append(["Silence", str(element.duration).split()[1].replace(">", ""), str(0)])
-                # else:
-                # print("SILENCE____",element.seconds)
-
-    with open('drive/MyDrive/UPC-Project/data/notes_big', 'wb') as filepath:
-        pickle.dump(notes, filepath)
-    return notes
-
-
-def prepare_sequence(seq, char2idx, onehot=False):
-    # convert sequence of words to indices
-    idxs = [char2idx[c] for c in seq]
-    idxs = torch.tensor(idxs, dtype=torch.long)
-    if onehot:
-        # conver to onehot (if input to network)
-        ohs = F.one_hot(idxs, len(char2idx)).long()
-        return ohs
-    else:
-        return idxs
-
-
-notes = get_notes_v2()
-
-# Saving and storing Notes data
-notes_list = [[item[0] for item in notes]]
-with open('drive/MyDrive/UPC-Project/data/blues_notes', 'wb') as filepath:
-    pickle.dump(notes_list, filepath)
-
-velocity_list_dec = [[str(item[2]) for item in notes]]
-velocity_list = [[]]
-for x in velocity_list_dec[0]:
-    if x != '0':
-        velocity_list[0].append(x)
-with open('drive/MyDrive/UPC-Project/data/blues_velocity', 'wb') as filepath:
-    pickle.dump(velocity_list, filepath)
-
-notes_duration_list = [["_".join([item[0], item[1]]) for item in notes]]
-with open('drive/MyDrive/UPC-Project/data/blues_duration', 'wb') as filepath:
-    pickle.dump(notes_duration_list, filepath)
-
-duration_list = [[item[1] for item in
-                  notes]]  # [[str((Fraction(item[1]).numerator/Fraction(item[1]).denominator)) for item in notes]]
-
-# position_list = [[str(item[3]) for item in notes]]
+class MidiPreprocessor:
 
+    def __init__(self, path):
+        self.path = path
 
-drive.mount('/content/drive')
+    @staticmethod
+    def normalize_durations(duration_list):
+        # Note Duration Normalization
+        lofi_bins = np.array([0.0, 0.25, 0.50, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0])
+        centers = (lofi_bins[1:] + lofi_bins[:-1]) / 2
+        duration_list_formatted = [str(lofi_bins[np.digitize(round(x, 2), centers)]) for x in duration_list[0]]
+        return duration_list_formatted
 
+    @staticmethod
+    def normalize_durations(velocity_list):
+        # Velocity Normalization
+        bins_vel = np.array([10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 150, 180, 200])
+        centers = (bins_vel[1:] + bins_vel[:-1]) / 2
+        velocity_list_formatted = [str(bins_vel[np.digitize(round(int(x), 2), centers)]) for x in velocity_list[0]]
+        return velocity_list_formatted
 
-def note_formatting(notes_test):
-    notes_formatted = []
-    for y in notes_test:
-        notes_formatted.append("_".join(y))
-    return notes_formatted
+    def format_and_save_final_data(self, notes_list, duration_list_formatted, velocity_list_formatted, chords_notes,
+                                   chords_duaration_formatted):
+        notes_duration_note_velocity_formatted_v2 = ["_".join([a, str(b), a, str(c)]) for a, b, c in
+                                                     zip(notes_list[0], duration_list_formatted,
+                                                         velocity_list_formatted)]
+        notes_duration_velocity_formatted_v2 = ["_".join([a, str(b), str(c)]) for a, b, c in
+                                                zip(notes_list[0], duration_list_formatted, velocity_list_formatted)]
+        notes_velocity_formatted_v2 = ["_".join([a, str(c)]) for a, b, c in
+                                       zip(notes_list[0], duration_list_formatted, velocity_list_formatted)]
+        notes_duration_formatted_v2 = ["_".join([a, str(b)]) for a, b in zip(notes_list[0], duration_list_formatted)]
+        velocity_list_formatted_v2 = ["_".join([str(a)]) for a in velocity_list_formatted]
+        chords_duration_formatted_v2 = ["_".join([a, str(b)]) for a, b in
+                                        zip(chords_notes[0], chords_duaration_formatted)]
 
+        with open(self.path + 'small_anime_final_notes_dur_note_vel', 'wb') as filepath:
+            pickle.dump(notes_duration_note_velocity_formatted_v2, filepath)
 
-notes_formatted = note_formatting(notes_list)
-notes_formatted = notes_formatted[0].split("_")
+        with open(self.path + 'small_anime_final_notes_dur_vel', 'wb') as filepath:
+            pickle.dump(notes_duration_velocity_formatted_v2, filepath)
 
-notes_duration_formatted = notes_duration_list[0]
+        with open(self.path + 'small_anime_final_notes_dur', 'wb') as filepath:
+            pickle.dump(notes_duration_formatted_v2, filepath)
 
-duration_formatted = note_formatting(duration_list)
-duration_formatted = duration_formatted[0].split("_")
+        with open(self.path + 'small_anime_final_notes_vel', 'wb') as filepath:
+            pickle.dump(notes_velocity_formatted_v2, filepath)
 
-velocity_formatted = note_formatting(velocity_list)
-velocity_formatted = velocity_formatted[0].split("_")
+        with open(self.path + 'small_anime_final_vel', 'wb') as filepath:
+            pickle.dump(velocity_list_formatted_v2, filepath)
 
-# get amount of pitch names
-n_vocab_notes = len(set(notes_formatted))
-n_vocab_duration = len(set(duration_formatted))
-n_vocab_velocity = len(set(velocity_formatted))
-n_vocab_notes_duration = len(set(notes_duration_formatted))
+        with open(self.path + 'small_anime_final_chord_dur', 'wb') as filepath:
+            pickle.dump(chords_duration_formatted_v2, filepath)
 
+        return notes_duration_note_velocity_formatted_v2, notes_duration_velocity_formatted_v2, \
+               notes_velocity_formatted_v2, notes_duration_formatted_v2, velocity_list_formatted_v2, chords_duration_formatted_v2
 
+    def load_formatted_data(self):
+        with open(self.path + 'small_anime_final_notes_dur_note_vel', 'rb') as filepath:
+            notes_duration_note_velocity_formatted_v2 = pickle.load(filepath)
 
-# merge the training data into one big text line
-training_data = notes_list
-#training_data = '_'.join(training_data[0])
+        with open(self.path + 'small_anime_final_notes_dur_vel', 'rb') as filepath:
+            notes_duration_velocity_formatted_v2 = pickle.load(filepath)
 
-# Assign a unique ID to each different character found in the training set
-char2idx = {}
-for sent in training_data:
-    for c in sent:
-        if c not in char2idx:
-            char2idx[c] = len(char2idx)
-idx2char = dict((v, k) for k, v in char2idx.items())
-VOCAB_SIZE = len(char2idx)
-print('Number of found vocabulary tokens: ', VOCAB_SIZE)
+        with open(self.path + 'small_anime_final_notes_dur', 'rb') as filepath:  # augmented_
+            notes_duration_formatted_v2 = pickle.load(filepath)
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        with open(self.path + 'small_anime_final_notes_vel', 'rb') as filepath:
+            notes_velocity_formatted_v2 = pickle.load(filepath)
 
-BATCH_SIZE = 500
-SEQ_LEN= 32 #, 70, 80,
+        with open(self.path + 'small_anime_final_vel', 'rb') as filepath:
+            velocity_list_formatted_v2 = pickle.load(filepath)
 
-T = len(training_data[0])
-CHUNK_SIZE = T // BATCH_SIZE
-# let's first chunk the huge train sequence into BATCH_SIZE sub-sequences
-trainset = [training_data[0][beg_i:end_i] \
-            for beg_i, end_i in zip(range(0, T - CHUNK_SIZE, CHUNK_SIZE),
-                                    range(CHUNK_SIZE, T, CHUNK_SIZE))]
-print('Original training string len: ', T)
-print('Sub-sequences len: ', CHUNK_SIZE)
+        with open(self.path + 'small_anime_final_chord_dur', 'rb') as filepath:
+            chords_duration_formatted_v2 = pickle.load(filepath)
 
-training_data
-train_set = []
+            return notes_duration_note_velocity_formatted_v2, notes_duration_velocity_formatted_v2, \
+                   notes_duration_formatted_v2, notes_velocity_formatted_v2, velocity_list_formatted_v2, chords_duration_formatted_v2
 
-# Create notes sequences of length 32.
-for beg_t, end_t in zip(range(0, len(training_data[0]) -1 , SEQ_LEN + 1),
-                          range(SEQ_LEN + 1, len(training_data[0]), SEQ_LEN + 1)):
-    train_set.append(training_data[0][beg_t:end_t])
+    def load_notes_old(self):
+        with open(self.path + 'small_notes_big', 'rb') as filepath:
+            notes = pickle.load(filepath)
+        with open(self.path + 'small_anime_notes', 'rb') as filepath:
+            notes_list = pickle.load(filepath)
 
+        with open(self.path + 'small_anime_velocity', 'rb') as filepath:
+            velocity_list = pickle.load(filepath)
 
-dataX = []
-dataY = []
+        with open(self.path + 'small_anime_notes_duration', 'rb') as filepath:
+            notes_duration_list = pickle.load(filepath)
 
-# Split input sequences and output sequences.
-for seq in train_set:
-    X = seq[:-1]
-    Y = seq[1:]
-    # convert each sequence to one-hots and labels respectively
-    X = prepare_sequence(X, char2idx, onehot=False) #no onehot encoding.
-    Y = prepare_sequence(Y, char2idx, onehot=False) #no onehot encoding.
+        with open(self.path + 'small_anime_notes_velocity', 'rb') as filepath:
+            notes_velocity_list = pickle.load(filepath)
 
-    dataX.append(X.unsqueeze(0))
-    dataY.append(Y.unsqueeze(0))
-dataX = torch.cat(dataX, dim=0).to(device)
-dataY = torch.cat(dataY, dim=0).to(device)
+        with open(self.path + 'small_anime_durations', 'rb') as filepath:
+            duration_list = pickle.load(filepath)
 
+        with open(self.path + 'small_anime_chords_note', 'rb') as filepath:
+            chords_notes = pickle.load(filepath)
 
-from torch.utils.data import Dataset, DataLoader
+        with open(self.path + 'small_anime_chords_duration', 'rb') as filepath:
+            chords_duaration = pickle.load(filepath)
 
-dataloaderX = DataLoader(dataX[:500], batch_size=10,shuffle=False) # batch_size=32,shuffle )
-dataloaderY = DataLoader(dataY[:500], batch_size=10,shuffle=False )
+        return notes, notes_list, velocity_list, notes_duration_list, notes_velocity_list, duration_list, chords_notes, chords_duaration
 
-batchX = next(iter(dataloaderX))
-batchY = next(iter(dataloaderY))
+    # for two embeddings model
+    @staticmethod
+    def prepare_sequence(seq, vel2idx, char2idx_note_dur, onehot=False):
+        # convert sequence of words to indices
+        seq = [x.split("_") for x in seq]
 
-print(batchX.shape)
-print(dataX.shape)
+        idxs_notes_dur = [char2idx_note_dur["_".join([c[0], str(c[1])])] for c in seq]
+        idxs_notes_dur = torch.tensor(idxs_notes_dur, dtype=torch.long)
 
-word_embeddings = torch.nn.Embedding(n_vocab_notes, 64)
-lstm = torch.nn.LSTM(64, 512, batch_first=True,bidirectional=False) #bidirectional=True ???
-lin = torch.nn.Linear(512, n_vocab_notes)
+        idxs_vel = [vel2idx[c[2]] for c in seq]
+        idxs_vel = torch.tensor(idxs_vel, dtype=torch.long)
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        return [idxs_notes_dur, idxs_vel]
 
-model = LSTM(n_vocab_notes,n_vocab_notes).to(device)
+    @staticmethod
+    def prepare_sequence_chords(seq, chord2idx, onehot=False):
+        # convert sequence of words to indices
+        seq = [x.split("_") for x in seq]
 
-#model.load_state_dict(torch.load("drive/MyDrive/UPC-Project/weigths/model.pt")) # blues
+        idxs_chords_dur = [chord2idx["_".join([c[0], str(c[1])])] for c in seq]
+        idxs_chords_dur = torch.tensor(idxs_chords_dur, dtype=torch.long)
 
-config = {
-        "lr": 1e-3, #1e-3, # 1e-5 1e-3
-        "batch_size": 64,
+        return idxs_chords_dur
 
-    }
-optimizer = optim.Adam(model.parameters(), config["lr"])
-criterion =F.nll_loss  #torch.nn.CrossEntropyLoss() #F.nll_loss
+    def create_and_save_velocity_vocab_dicts(self, velocity_list_formated_v2):
+        # merge the training data into one big text line
+        training_data = [
+            velocity_list_formated_v2]  # notes_duration_formated_v2 /  notes_duration_list  notes_duration_list
+        # training_data = '_'.join(training_data[0])
+
+        # Assign a unique ID to each different character found in the training set
+        vel2idx = {}
+        for sent in training_data:
+            for c in sent:
+                if c not in vel2idx:
+                    vel2idx[c] = len(vel2idx)
+        idx2vel = dict((v, k) for k, v in vel2idx.items())
+        vel_VOCAB_SIZE = len(vel2idx)
+        print('Number of found vocabulary tokens: ', vel_VOCAB_SIZE)
+
+        with open(self.path + 'small_vel2idx', 'wb') as filepath:
+            pickle.dump(vel2idx, filepath)
+
+        with open(self.path + 'small_idx2vel', 'wb') as filepath:
+            pickle.dump(idx2vel, filepath)
+
+        with open(self.path + 'small_vel_VOCAB_SIZE', 'wb') as filepath:
+            pickle.dump(vel_VOCAB_SIZE, filepath)
+
+        return vel2idx, idx2vel, vel_VOCAB_SIZE
+
+    def load_velocity_vocab_dicts(self):
+        with open(self.path + 'small_vel2idx', 'rb') as filepath:
+            vel2idx = pickle.load(filepath)
+
+        with open(self.path + 'small_idx2vel', 'rb') as filepath:
+            idx2vel = pickle.load(filepath)
+
+        with open(self.path + 'small_vel_VOCAB_SIZE', 'rb') as filepath:
+            vel_VOCAB_SIZE = pickle.load(filepath)
+
+        return vel2idx, idx2vel, vel_VOCAB_SIZE
+
+    def create_and_save_chords_vocab_dicts(self, chords_duration_formated_v2):
+        training_data = [chords_duration_formated_v2]
+        chord2idx = {}
+        for sent in training_data:
+            for c in sent:
+                if c not in chord2idx:
+                    chord2idx[c] = len(chord2idx)
+        idx2chord = dict((v, k) for k, v in chord2idx.items())
+        chord_VOCAB_SIZE = len(chord2idx)
+        print('Number of found vocabulary tokens: ', chord_VOCAB_SIZE)
+
+        with open(self.path + 'small_chord2idx', 'wb') as filepath:
+            pickle.dump(chord2idx, filepath)
+
+        with open(self.path + 'small_idx2chord', 'wb') as filepath:
+            pickle.dump(idx2chord, filepath)
+
+        with open(self.path + 'small_chord_VOCAB_SIZE', 'wb') as filepath:
+            pickle.dump(chord_VOCAB_SIZE, filepath)
+
+        return chord2idx, idx2chord, chord_VOCAB_SIZE
+
+    def load_chords_vocab_dicts(self):
+        with open(self.path + 'small_chord2idx', 'rb') as filepath:
+            # with open('data/lofi_notes_velocity', 'rb') as filepath:
+            chord2idx = pickle.load(filepath)
+
+        with open(self.path + 'small_idx2chord', 'rb') as filepath:
+            # with open('data/lofi_notes_velocity', 'rb') as filepath:
+            idx2chord = pickle.load(filepath)
+
+        with open(self.path + 'small_chord_VOCAB_SIZE', 'rb') as filepath:
+            # with open('data/lofi_notes_velocity', 'rb') as filepath:
+            chord_VOCAB_SIZE = pickle.load(filepath)
+
+            return chord2idx, idx2chord, chord_VOCAB_SIZE
+
+    def create_and_save_notes_durations_vocab_dicts(self, notes_duration_formated_v2):
+        # merge the training data into one big text line
+
+        training_data = [notes_duration_formated_v2]
+        char2idx_note_dur = {}
+        for sent in training_data:
+            for c in sent:
+                if c not in char2idx_note_dur:
+                    char2idx_note_dur[c] = len(char2idx_note_dur)
+        idx2char_note_dur = dict((v, k) for k, v in char2idx_note_dur.items())
+        note_dur_VOCAB_SIZE = len(char2idx_note_dur)
+        print('Number of found vocabulary tokens: ', note_dur_VOCAB_SIZE)
+
+        with open(self.path + 'small_char2idx_note_dur', 'wb') as filepath:
+            pickle.dump(char2idx_note_dur, filepath)
+
+        with open(self.path + 'small_idx2char_note_dur', 'wb') as filepath:
+            pickle.dump(idx2char_note_dur, filepath)
+
+        with open(self.path + 'small_note_dur_VOCAB_SIZE', 'wb') as filepath:
+            pickle.dump(note_dur_VOCAB_SIZE, filepath)
+
+        return char2idx_note_dur, idx2char_note_dur, note_dur_VOCAB_SIZE
+
+    def load_notes_durations_vocab_dicts(self):
+        with open(self.path + 'small_char2idx_note_dur', 'rb') as filepath:
+            # with open('data/lofi_notes_velocity', 'rb') as filepath:
+            char2idx_note_dur = pickle.load(filepath)
+
+        with open(self.path + 'small_idx2char_note_dur', 'rb') as filepath:
+            # with open('data/lofi_notes_velocity', 'rb') as filepath:
+            idx2char_note_dur = pickle.load(filepath)
+
+        with open(self.path + 'small_note_dur_VOCAB_SIZE', 'rb') as filepath:
+            # with open('data/lofi_notes_velocity', 'rb') as filepath:
+            note_dur_VOCAB_SIZE = pickle.load(filepath)
+
+        return char2idx_note_dur, idx2char_note_dur, note_dur_VOCAB_SIZE
+
+
+    #TODO make loader of those files
+    def create_and_save_notes_duration_velocity_vocab_dicts(self, notes_duration_velocity_formated_v2):
+        # merge the training data into one big text line
+        training_data = [
+            notes_duration_velocity_formated_v2]  # notes_duration_formated_v2 /  notes_duration_list  notes_duration_list
+
+        char2idx_note_dur_vel = {}
+        for sent in training_data:
+            for c in sent:
+                if c not in char2idx_note_dur_vel:
+                    char2idx_note_dur_vel[c] = len(char2idx_note_dur_vel)
+        idx2char_note_dur_vel = dict((v, k) for k, v in char2idx_note_dur_vel.items())
+        note_dur_vel_VOCAB_SIZE = len(char2idx_note_dur_vel)
+        print('Number of found vocabulary tokens: ', note_dur_vel_VOCAB_SIZE)
+
+        with open(self.path + 'small_char2idx_note_dur_vel', 'wb') as filepath:
+            pickle.dump(char2idx_note_dur_vel, filepath)
+
+        with open(self.path + 'small_idx2char_note_dur_vel', 'wb') as filepath:
+            pickle.dump(idx2char_note_dur_vel, filepath)
+
+        with open(self.path + 'small_note_dur_vel_VOCAB_SIZE', 'wb') as filepath:
+            pickle.dump(note_dur_vel_VOCAB_SIZE, filepath)
+
+        return char2idx_note_dur_vel, idx2char_note_dur_vel, note_dur_vel_VOCAB_SIZE
+
+
+    def load_notes_duration_velocity_vocab_dicts(self):
+        with open(self.path + 'small_char2idx_note_dur_vel', 'rb') as filepath:
+            char2idx_note_dur_vel = pickle.load(filepath)
+
+        with open(self.path + 'small_idx2char_note_dur_vel', 'rb') as filepath:
+            idx2char_note_dur_vel = pickle.load(filepath)
+
+        with open(self.path + 'small_note_dur_vel_VOCAB_SIZE', 'rb') as filepath:
+            note_dur_vel_VOCAB_SIZE = pickle.load(filepath)
+
+        return char2idx_note_dur_vel, idx2char_note_dur_vel, note_dur_vel_VOCAB_SIZE
+
+    @staticmethod
+    def normalize_durations(duration_list):
+        # Note Duration Normalization
+        lofi_bins = np.array([0.0, 0.25, 0.50, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0])
+        centers = (lofi_bins[1:] + lofi_bins[:-1]) / 2
+        duration_list_formated = [str(lofi_bins[np.digitize(round(x, 2), centers)]) for x in duration_list[0]]
+        return duration_list_formated
+
+    @staticmethod
+    def normalize_durations_chords(chord_duration_list):
+        # Chord Duration Normalization
+        lofi_bins = np.array([2.0, 3.0, 4.0])
+        centers = (lofi_bins[1:] + lofi_bins[:-1]) / 2
+        duration_list_formated = [str(lofi_bins[np.digitize(round(float(x), 2), centers)]) for x in
+                                  chord_duration_list[0]]
+        return duration_list_formated
+
+    @staticmethod
+    def normalize_velocity(velocity_list):
+        # Velocity Normalization
+        bins_vel = np.array([10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 150, 180, 200])
+        centers = (bins_vel[1:] + bins_vel[:-1]) / 2
+        velocity_list_formated = [str(bins_vel[np.digitize(round(int(x), 2), centers)]) for x in velocity_list[0]]
+        return velocity_list_formated
