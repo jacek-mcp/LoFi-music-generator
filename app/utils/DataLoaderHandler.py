@@ -7,8 +7,8 @@ from app.utils.Midi_preprocessor import MidiPreprocessor
 
 class DataLoaderHandler:
 
-    def __init__(self, path):
-        self.data_manager = DataManager(path)
+    def __init__(self, data_manager):
+        self.data_manager = data_manager
 
     def get_note_velocity_loaders(self, data):
 
