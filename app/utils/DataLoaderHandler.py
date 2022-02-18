@@ -1,13 +1,14 @@
 import torch
 from torch.utils.data import Dataset, DataLoader
 
+from app.utils.DataManager import DataManager
 from app.utils.Midi_preprocessor import MidiPreprocessor
 
 
 class DataLoaderHandler:
 
-    def __init__(self, path):
-        self.preprocessor = MidiPreprocessor(path)
+    def __init__(self, data_manager):
+        self.data_manager = data_manager
 
     def get_note_velocity_loaders(self, data):
 
@@ -25,14 +26,14 @@ class DataLoaderHandler:
         dataY = []
         # Split input sequences and output sequences.
 
-        vel2idx, idx2vel, vel_VOCAB_SIZE = self.preprocessor.load_velocity_vocab_dicts()
-        char2idx_note_dur, idx2char_note_dur, note_dur_VOCAB_SIZE = self.preprocessor.load_notes_durations_vocab_dicts()
+        velocity_vocab_dict = self.data_manager.load_velocity_vocab_dicts()
+        duration_vocab_dict = self.data_manager.load_notes_durations_vocab_dicts()
 
         for seq in train_set:
             X = seq[:-1]
             Y = seq[1:]
-            X = self.preprocessor.prepare_sequence(X, vel2idx, char2idx_note_dur)  # no onehot encoding.
-            Y = self.preprocessor.prepare_sequence(Y, vel2idx, char2idx_note_dur)  # no onehot encoding.
+            X = MidiPreprocessor.prepare_sequence(X, velocity_vocab_dict['vel2idx'], duration_vocab_dict['char2idx_note_dur'])  # no onehot encoding.
+            Y = MidiPreprocessor.prepare_sequence(Y, velocity_vocab_dict['vel2idx'], duration_vocab_dict['char2idx_note_dur'])  # no onehot encoding.
 
             dataX.append(torch.stack(X))
             dataY.append(torch.stack(Y))
@@ -57,13 +58,13 @@ class DataLoaderHandler:
         dataX = []
         dataY = []
 
-        chord2idx, idx2chord, chord_VOCAB_SIZE = self.preprocessor.load_chords_vocab_dicts()
+        chords_vocab_dict = self.data_manager.load_chords_vocab_dicts()
         # Split input sequences and output sequences.
         for seq in train_set:
             X = seq[:-1]
             Y = seq[1:]
-            X = self.preprocessor.prepare_sequence_chords(X, chord2idx, onehot=False)  # no onehot encoding.
-            Y = self.preprocessor.prepare_sequence_chords(Y, chord2idx, onehot=False)  # no onehot encoding.
+            X = MidiPreprocessor.prepare_sequence_chords(X, chords_vocab_dict['chord2idx'], onehot=False)  # no onehot encoding.
+            Y = MidiPreprocessor.prepare_sequence_chords(Y, chords_vocab_dict['chord2idx'], onehot=False)  # no onehot encoding.
 
             dataX.append(X.unsqueeze(0))
             dataY.append(Y.unsqueeze(0))
