@@ -86,8 +86,7 @@ def gen_notes_two_embeddings(model_two_embeddings, num_chars):
 
     model_two_embeddings.eval()
     state = None
-    inputs = MidiPreprocessor.prepare_sequence(seed, valocity_vocab_dict['vel2idx'],
-                                               duration_vocab_dict['char2idx_note_dur'])
+    inputs = MidiPreprocessor.prepare_sequence(seed, duration_vocab_dict['char2idx'],duration_vocab_dict['dur2idx'], velocity_vocab_dict['vel2idx'])
     x1 = inputs[0].reshape(1, len(inputs[0]))
     x2 = inputs[1].reshape(1, len(inputs[1]))
 
@@ -119,8 +118,7 @@ def gen_notes_two_embeddings(model_two_embeddings, num_chars):
         else:
             curr_pred = curr_pred
             # print(curr_pred)
-        curr_pred = MidiPreprocessor.prepare_sequence(seed, valocity_vocab_dict['vel2idx'],
-                                                      duration_vocab_dict['char2idx_note_dur'])
+        curr_pred = MidiPreprocessor.prepare_sequence(seed, duration_vocab_dict['char2idx'],duration_vocab_dict['dur2idx'], velocity_vocab_dict['vel2idx'])
 
         curr_pred_note = curr_pred[0].reshape(1, len(curr_pred[0]))
         curr_pred_vel = curr_pred[1].reshape(1, len(curr_pred[1]))
