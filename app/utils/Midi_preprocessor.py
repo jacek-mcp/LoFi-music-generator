@@ -22,17 +22,24 @@ class MidiPreprocessor:
 
     # for two embeddings model
     @staticmethod
-    def prepare_sequence(seq, vel2idx, char2idx_note_dur, onehot=False):
+    def prepare_sequence(seq,char2idx,dur2idx, vel2idx, onehot=False):
+        #3 embeddings version
         # convert sequence of words to indices
         seq = [x.split("_") for x in seq]
 
-        idxs_notes_dur = [char2idx_note_dur["_".join([c[0], str(c[1])])] for c in seq]
-        idxs_notes_dur = torch.tensor(idxs_notes_dur, dtype=torch.long)
+        #idxs_notes_dur = [char2idx_note_dur["_".join([c[0], str(c[1])])] for c in seq]
+        #idxs_notes_dur = torch.tensor(idxs_notes_dur, dtype=torch.long)
+        
+        idxs_notes = [char2idx[c[0]] for c in seq]
+        idxs_notes = torch.tensor(idxs_notes, dtype=torch.long)
+        
+        idxs_dur = [dur2idx[c[1]] for c in seq]
+        idxs_dur = torch.tensor(idxs_dur, dtype=torch.long)
 
         idxs_vel = [vel2idx[c[2]] for c in seq]
         idxs_vel = torch.tensor(idxs_vel, dtype=torch.long)
 
-        return [idxs_notes_dur, idxs_vel]
+        return [idxs_notes,idxs_dur, idxs_vel]
 
     @staticmethod
     def prepare_sequence_chords(seq, chord2idx, onehot=False):
