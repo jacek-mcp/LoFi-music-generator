@@ -1,3 +1,4 @@
+import AudioSegment as AudioSegment
 import music21
 import numpy as np
 import torch
@@ -18,6 +19,8 @@ import music21
 from fractions import Fraction
 from collections import defaultdict
 import os
+
+from midi2audio import FluidSynth
 
 config = {
     "lr": 1e-3,  # 1e-3, # 1e-5 1e-3
@@ -471,12 +474,29 @@ if __name__ == '__main__':
         preds_notes = gen_notes_two_embeddings(model_two_embeddings, 200)
         print(preds_notes)
 
+    if __name__ == '__main__':
 
+        # possible modes: 'train_main', 'train_chords', 'generate_notes'
+        mode = 'generate_notes'
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+        if mode == 'train_main':
+            train_model()
+        elif mode == 'train_chords':
+            train_chords_model()
+        elif mode == 'generate_notes':
+
+            data_manager = DataManager()
+            dvd = data_manager.load_notes_durations_vocab_dicts()
+            vvd = data_manager.load_velocity_vocab_dicts()
+            model_two_embeddings = LSTMT.LSTMT_2embeddings(dvd['note_dur_VOCAB_SIZE'],
+                                                           vvd['vel_VOCAB_SIZE']).to(device)
+            model_two_embeddings.load_state_dict(torch.load(MODELS_PATH + "fake_test_two_embeddings_2_7.9.pt"))
+            preds_notes = gen_notes_two_embeddings(model_two_embeddings, 200)
+            print(preds_notes)
 
     # model_two_embeddings = LSTMT.LSTMT_2embeddings(note_dur_VOCAB_SIZE, vel_VOCAB_SIZE).to(device)
     # model_chord = LSTMT.LSTMT_chord(chord_VOCAB_SIZE).to(device)
 
     # preds_notes = gen_notes_two_embeddings(model_two_embeddings, 200)
     # preds_chord = gen_notes_chords(model_chord, 50)
-
-
