@@ -451,7 +451,7 @@ def create_midi_notes_velocity_chords(prediction_output, chord_output, inst, str
 if __name__ == '__main__':
 
     # possible modes: 'train_main', 'train_chords', 'generate_notes'
-    mode = 'generate_notes'
+    mode = 'train_main'
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     if mode == 'train_main':
