@@ -3,7 +3,7 @@ import torch
 
 class LSTMT_3embeddings(torch.nn.Module):
     def __init__(self, vocab_size,dur_vocab_size,velocities_vocab_size):
-        super(LSTMT_2embeddings, self).__init__()
+        super(LSTMT_3embeddings, self).__init__()
         hidden_dim = 512
         embbeding_dim = 64
         self.encoder = torch.nn.Embedding(vocab_size, embbeding_dim)
