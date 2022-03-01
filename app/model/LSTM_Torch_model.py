@@ -1,7 +1,7 @@
 import torch
 
 
-class LSTMT_2embeddings(torch.nn.Module):
+class LSTMT_3embeddings(torch.nn.Module):
     def __init__(self, vocab_size,dur_vocab_size,velocities_vocab_size):
         super(LSTMT_2embeddings, self).__init__()
         hidden_dim = 512
