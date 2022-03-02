@@ -453,7 +453,7 @@ def create_midi_notes_velocity_chords(prediction_output, chord_output, inst, str
     return output_notes, song, temp
 
 
-def create_midi_notes(duration):
+def create_midi_notes(duration, model_name):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     data_manager = DataManager()
@@ -461,7 +461,7 @@ def create_midi_notes(duration):
     vvd = data_manager.load_velocity_vocab_dicts()
     model_two_embeddings = LSTMT.LSTMT_2embeddings(dvd['note_dur_VOCAB_SIZE'],
                                                    vvd['vel_VOCAB_SIZE']).to(device)
-    model_two_embeddings.load_state_dict(torch.load(MODELS_PATH + "fake_test_two_embeddings_2_7.9.pt"))
+    model_two_embeddings.load_state_dict(torch.load(MODELS_PATH + model_name))
     preds_notes = gen_notes_two_embeddings(model_two_embeddings, duration)
 
     offset = 0
@@ -546,7 +546,7 @@ if __name__ == '__main__':
     elif mode == 'train_chords':
         train_chords_model()
     elif mode == 'generate_notes':
-        name = create_midi_notes(200)
+        name = create_midi_notes(200, "fake_test_two_embeddings_2_7.9.pt")
         midiWav = MidiToWav(PATH)
         midiWav.set_name(name)
         midiWav.midi_to_wav()
