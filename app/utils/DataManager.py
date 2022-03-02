@@ -78,21 +78,21 @@ class DataManager:
         return result_set
 
     def load_notes_old(self):
-        with open(self.path + 'small_notes_big', 'rb') as filepath:
+        with open(self.path + 'big_notes_big', 'rb') as filepath:
             notes = pickle.load(filepath)
         with open(self.path + 'small_anime_notes', 'rb') as filepath:
             notes_list = pickle.load(filepath)
 
-        with open(self.path + 'small_anime_velocity', 'rb') as filepath:
+        with open(self.path + 'big_anime_velocity', 'rb') as filepath:
             velocity_list = pickle.load(filepath)
 
-        with open(self.path + 'small_anime_notes_duration', 'rb') as filepath:
+        with open(self.path + 'big_anime_notes_duration', 'rb') as filepath:
             notes_duration_list = pickle.load(filepath)
 
-        with open(self.path + 'small_anime_notes_velocity', 'rb') as filepath:
+        with open(self.path + 'big_anime_notes_velocity', 'rb') as filepath:
             notes_velocity_list = pickle.load(filepath)
 
-        with open(self.path + 'small_anime_durations', 'rb') as filepath:
+        with open(self.path + 'big_anime_durations', 'rb') as filepath:
             duration_list = pickle.load(filepath)
 
         with open(self.path + 'small_anime_chords_note', 'rb') as filepath:
