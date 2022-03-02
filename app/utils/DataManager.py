@@ -21,59 +21,80 @@ class DataManager:
         velocity_list_formatted_v2 = ["_".join([str(a)]) for a in velocity_list_formatted]
         chords_duration_formatted_v2 = ["_".join([a, str(b)]) for a, b in
                                         zip(chords_notes[0], chords_duaration_formatted)]
+        notes_formatted_v2 = ["_".join([a]) for a in zip(notes_list[0])]
+        duration_formatted_v2 = ["_".join([a]) for a in zip(duration_list_formated)]
 
-        with open(self.path + 'small_anime_final_notes_dur_note_vel', 'wb') as filepath:
+        with open(self.path + 'big_anime_final_notes_dur_note_vel', 'wb') as filepath:
             pickle.dump(notes_duration_note_velocity_formatted_v2, filepath)
 
-        with open(self.path + 'small_anime_final_notes_dur_vel', 'wb') as filepath:
+        with open(self.path + 'big_anime_final_notes_dur_vel', 'wb') as filepath:
             pickle.dump(notes_duration_velocity_formatted_v2, filepath)
 
-        with open(self.path + 'small_anime_final_notes_dur', 'wb') as filepath:
+        with open(self.path + 'big_anime_final_notes_dur', 'wb') as filepath:
             pickle.dump(notes_duration_formatted_v2, filepath)
 
-        with open(self.path + 'small_anime_final_notes_vel', 'wb') as filepath:
+        with open(self.path + 'big_anime_final_notes_vel', 'wb') as filepath:
             pickle.dump(notes_velocity_formatted_v2, filepath)
 
-        with open(self.path + 'small_anime_final_vel', 'wb') as filepath:
+        with open(self.path + 'big_anime_final_vel', 'wb') as filepath:
             pickle.dump(velocity_list_formatted_v2, filepath)
 
         with open(self.path + 'small_anime_final_chord_dur', 'wb') as filepath:
             pickle.dump(chords_duration_formatted_v2, filepath)
+            
+        with open(self.path + 'big_anime_final_notes', 'wb') as filepath:
+            pickle.dump(notes_formatted_v2, filepath)
+ 
+        with open(self.path + 'big_anime_final_duration', 'wb') as filepath:
+            pickle.dump(duration_formatted_v2, filepath)
 
         result_set = {'notes_duration_note_velocity_formatted_v2': notes_duration_note_velocity_formatted_v2,
                       'notes_duration_velocity_formatted_v2': notes_duration_velocity_formatted_v2,
                       'notes_velocity_formatted_v2': notes_velocity_formatted_v2,
                       'notes_duration_formatted_v2': notes_duration_formatted_v2,
                       'velocity_list_formatted_v2': velocity_list_formatted_v2,
-                      'chords_duration_formatted_v2': chords_duration_formatted_v2}
+                      'chords_duration_formatted_v2': chords_duration_formatted_v2,
+                      'notes_formatted_v2': notes_formatted_v2,
+                      'duration_formatted_v2': duration_formatted_v2}
+
+ 
 
         return result_set
 
     def load_formatted_data(self):
-        with open(self.path + 'small_anime_final_notes_dur_note_vel', 'rb') as filepath:
+        with open(self.path + 'big_anime_final_notes_dur_note_vel', 'rb') as filepath:
             notes_duration_note_velocity_formatted_v2 = pickle.load(filepath)
 
-        with open(self.path + 'small_anime_final_notes_dur_vel', 'rb') as filepath:
+        with open(self.path + 'big_anime_final_notes_dur_vel', 'rb') as filepath:
             notes_duration_velocity_formatted_v2 = pickle.load(filepath)
 
-        with open(self.path + 'small_anime_final_notes_dur', 'rb') as filepath:  # augmented_
+        with open(self.path + 'big_anime_final_notes_dur', 'rb') as filepath:  # augmented_
             notes_duration_formatted_v2 = pickle.load(filepath)
 
-        with open(self.path + 'small_anime_final_notes_vel', 'rb') as filepath:
+        with open(self.path + 'big_anime_final_notes_vel', 'rb') as filepath:
             notes_velocity_formatted_v2 = pickle.load(filepath)
 
-        with open(self.path + 'small_anime_final_vel', 'rb') as filepath:
+        with open(self.path + 'big_anime_final_vel', 'rb') as filepath:
             velocity_list_formatted_v2 = pickle.load(filepath)
 
         with open(self.path + 'small_anime_final_chord_dur', 'rb') as filepath:
             chords_duration_formatted_v2 = pickle.load(filepath)
+            
+  
+        with open(self.path + 'big_anime_final_notes', 'rb') as filepath:
+            notes_formatted_v2 = pickle.load(filepath)
+            
+        with open(self.path + 'big_anime_final_duration', 'rb') as filepath:
+            duration_formatted_v2 = pickle.load(filepath)
 
         result_set = {'notes_duration_note_velocity_formatted_v2': notes_duration_note_velocity_formatted_v2,
                       'notes_duration_velocity_formatted_v2': notes_duration_velocity_formatted_v2,
                       'notes_velocity_formatted_v2': notes_velocity_formatted_v2,
                       'notes_duration_formatted_v2': notes_duration_formatted_v2,
                       'velocity_list_formatted_v2': velocity_list_formatted_v2,
-                      'chords_duration_formatted_v2': chords_duration_formatted_v2}
+                      'chords_duration_formatted_v2': chords_duration_formatted_v2,
+                      'notes_formatted_v2': notes_formatted_v2,
+                      'duration_formatted_v2': duration_formatted_v2}
 
         return result_set
 
@@ -245,6 +266,59 @@ class DataManager:
                       'note_dur_VOCAB_SIZE': note_dur_VOCAB_SIZE}
 
         return result_set
+    
+    ______________
+    
+    def create_and_save_notes_vocab_dicts(self, notes_duration_formated_v2):
+        # merge the training data into one big text line
+
+        training_data = [notes_duration_formated_v2]
+        char2idx_note_dur = {}
+        for sent in training_data:
+            for c in sent:
+                if c not in char2idx_note_dur:
+                    char2idx_note_dur[c] = len(char2idx_note_dur)
+        idx2char_note_dur = dict((v, k) for k, v in char2idx_note_dur.items())
+        note_dur_VOCAB_SIZE = len(char2idx_note_dur)
+        print('Number of found vocabulary tokens: ', note_dur_VOCAB_SIZE)
+
+        with open(self.path + 'small_char2idx_note_dur', 'wb') as filepath:
+            pickle.dump(char2idx_note_dur, filepath)
+
+        with open(self.path + 'small_idx2char_note_dur', 'wb') as filepath:
+            pickle.dump(idx2char_note_dur, filepath)
+
+        with open(self.path + 'small_note_dur_VOCAB_SIZE', 'wb') as filepath:
+            pickle.dump(note_dur_VOCAB_SIZE, filepath)
+
+        result_set = {'char2idx_note_dur': char2idx_note_dur,
+                      'idx2char_note_dur': idx2char_note_dur,
+                      'note_dur_VOCAB_SIZE': note_dur_VOCAB_SIZE}
+
+        return result_set
+
+    def load_notes_durations_vocab_dicts(self):
+        with open(self.path + 'small_char2idx_note_dur', 'rb') as filepath:
+            # with open('data/lofi_notes_velocity', 'rb') as filepath:
+            char2idx_note_dur = pickle.load(filepath)
+
+        with open(self.path + 'small_idx2char_note_dur', 'rb') as filepath:
+            # with open('data/lofi_notes_velocity', 'rb') as filepath:
+            idx2char_note_dur = pickle.load(filepath)
+
+        with open(self.path + 'small_note_dur_VOCAB_SIZE', 'rb') as filepath:
+            # with open('data/lofi_notes_velocity', 'rb') as filepath:
+            note_dur_VOCAB_SIZE = pickle.load(filepath)
+
+        result_set = {'char2idx_note_dur': char2idx_note_dur,
+                      'idx2char_note_dur': idx2char_note_dur,
+                      'note_dur_VOCAB_SIZE': note_dur_VOCAB_SIZE}
+
+        return result_set
+    ___________-
+    
+    
+    
 
     def create_and_save_notes_duration_velocity_vocab_dicts(self, notes_duration_velocity_formated_v2):
         # merge the training data into one big text line
