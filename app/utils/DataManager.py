@@ -359,8 +359,8 @@ class DataManager:
             # with open('data/lofi_notes_velocity', 'rb') as filepath:
             dur_VOCAB_SIZE = pickle.load(filepath)
 
-        result_set = {'char2idx': dur2idx,
-                      'idx2char': idx2dur,
+        result_set = {'dur2idx': dur2idx,
+                      'idx2dur': idx2dur,
                       'dur_VOCAB_SIZE': dur_VOCAB_SIZE}
 
         return result_set
