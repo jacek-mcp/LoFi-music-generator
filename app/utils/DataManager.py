@@ -42,10 +42,10 @@ class DataManager:
         with open(self.path + 'small_anime_final_chord_dur', 'wb') as filepath:
             pickle.dump(chords_duration_formatted_v2, filepath)
             
-        with open(self.path + 'big_anime_final_notes', 'wb') as filepath:
+        with open(self.path + 'big_anime_final_notes_v2', 'wb') as filepath:
             pickle.dump(notes_formatted_v2, filepath)
  
-        with open(self.path + 'big_anime_final_duration', 'wb') as filepath:
+        with open(self.path + 'big_anime_final_duration_v2', 'wb') as filepath:
             pickle.dump(duration_formatted_v2, filepath)
 
         result_set = {'notes_duration_note_velocity_formatted_v2': notes_duration_note_velocity_formatted_v2,
@@ -62,29 +62,29 @@ class DataManager:
         return result_set
 
     def load_formatted_data(self):
-        with open(self.path + 'big_anime_final_notes_dur_note_vel', 'rb') as filepath:
+        with open(self.path + 'big_anime_final_notes_dur_note_vel', 'rb') as filepath: # big_anime_final_notes_dur_note_vel_v2
             notes_duration_note_velocity_formatted_v2 = pickle.load(filepath)
 
-        with open(self.path + 'big_anime_final_notes_dur_vel', 'rb') as filepath:
+        with open(self.path + 'big_anime_final_notes_dur_vel', 'rb') as filepath: # big_anime_final_notes_dur_vel_v2
             notes_duration_velocity_formatted_v2 = pickle.load(filepath)
 
-        with open(self.path + 'big_anime_final_notes_dur', 'rb') as filepath:  # augmented_
+        with open(self.path + 'big_anime_final_notes_dur', 'rb') as filepath:  # big_anime_final_notes_dur_v2
             notes_duration_formatted_v2 = pickle.load(filepath)
 
-        with open(self.path + 'big_anime_final_notes_vel', 'rb') as filepath:
+        with open(self.path + 'big_anime_final_notes_vel', 'rb') as filepath: #big_anime_final_notes_vel_v2
             notes_velocity_formatted_v2 = pickle.load(filepath)
 
-        with open(self.path + 'big_anime_final_vel', 'rb') as filepath:
+        with open(self.path + 'big_anime_final_vel', 'rb') as filepath: # big_anime_final_vel_v2
             velocity_list_formatted_v2 = pickle.load(filepath)
 
-        with open(self.path + 'small_anime_final_chord_dur', 'rb') as filepath:
+        with open(self.path + 'small_anime_final_chord_dur', 'rb') as filepath: # big_anime_final_chord_dur_v2
             chords_duration_formatted_v2 = pickle.load(filepath)
             
   
-        with open(self.path + 'big_anime_final_notes', 'rb') as filepath:
+        with open(self.path + 'big_anime_final_notes_v2', 'rb') as filepath: 
             notes_formatted_v2 = pickle.load(filepath)
             
-        with open(self.path + 'big_anime_final_duration', 'rb') as filepath:
+        with open(self.path + 'big_anime_final_duration_v2', 'rb') as filepath: 
             duration_formatted_v2 = pickle.load(filepath)
 
         result_set = {'notes_duration_note_velocity_formatted_v2': notes_duration_note_velocity_formatted_v2,
