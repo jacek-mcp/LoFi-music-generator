@@ -21,8 +21,8 @@ class DataManager:
         velocity_list_formatted_v2 = ["_".join([str(a)]) for a in velocity_list_formatted]
         chords_duration_formatted_v2 = ["_".join([a, str(b)]) for a, b in
                                         zip(chords_notes[0], chords_duaration_formatted)]
-        notes_formatted_v2 = ["_".join([a]) for a in zip(notes_list[0])]
-        duration_formatted_v2 = ["_".join([a]) for a in zip(duration_list_formated)]
+        notes_formatted_v2 = [a for a in notes_list[0]]
+        duration_formatted_v2 = [a for a in duration_list_formated]
 
         with open(self.path + 'big_anime_final_notes_dur_note_vel', 'wb') as filepath:
             pickle.dump(notes_duration_note_velocity_formatted_v2, filepath)
