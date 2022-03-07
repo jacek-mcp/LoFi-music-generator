@@ -71,6 +71,18 @@ class MidiToWav:
             self.midi_path + self.name + '.mid',
             self.wav_path + self.name + '.wav')
 
+    def add_chords(self, instrument, chords_midi_name):
+        FluidSynth(self.sf2_path + self.instruments_mapper.get_instrument_file_name(instrument)).midi_to_audio(
+            self.midi_path + chords_midi_name + '.mid',
+            self.wav_path + chords_midi_name + '.wav')
+
+        notes = AudioSegment.from_file(self.wav_path + self.name + '.wav')
+        chords = AudioSegment.from_file(self.wav_path + chords_midi_name + '.wav')
+
+        merged = notes.overlay(chords)
+
+        merged.export(self.wav_path + self.name + '.wav', format='wav')
+
     def post_effects(self, effects_list):
         sound = AudioSegment.from_file(self.wav_path + self.name + '.wav')
 

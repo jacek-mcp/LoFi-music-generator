@@ -1,4 +1,3 @@
-import music21
 import numpy as np
 import torch
 import app.model.LSTM_Torch_model as LSTMT
@@ -11,15 +10,16 @@ from app.utils.DataLoaderHandler import DataLoaderHandler
 from app.utils.DataManager import DataManager
 from app.utils.MidiToWav import MidiToWav
 from app.utils.Midi_preprocessor import MidiPreprocessor
+from app.utils.mappers.EffectsMapper import EffectsMapper
+from app.utils.mappers.InstrumentsMapper import InstrumentsMapper
 
-import pickle
 import numpy
 from music21 import instrument, note, stream, chord
 import music21
 from fractions import Fraction
-from collections import defaultdict
 import os
 import time
+import sys
 
 config = {
     "lr": 1e-3,  # 1e-3, # 1e-5 1e-3
@@ -30,12 +30,12 @@ config = {
 PATH = os.getcwd() + '/data/'
 MODELS_PATH = PATH + '/models/'
 MIDI_PATH = PATH + '/midi/'
+GEN_SIZE = 200
 
 
 def intersection(lst1, lst2):
     lst3 = [value for value in lst1 if value in lst2]
     return lst3
-
 
 
 def gen_notes_two_embeddings(model_two_embeddings, num_chars):
@@ -292,7 +292,7 @@ def train_model():
     # plt.ylabel('NLLLoss')
 
 
-def create_midi_chords(duration, model_name):
+def create_midi_chords(duration, model_name, song_name=None):
     """ convert the output from the prediction to notes and create a midi file
         from the notes """
 
@@ -361,8 +361,11 @@ def create_midi_chords(duration, model_name):
     midi_stream_chord.insert(tempo.MetronomeMark('lofi', temp))
     midi_stream_chord.insert(0, meter.TimeSignature('4/4'))
 
-    datetime = time.strftime('%Y%m%d%H%M%S', time.localtime(time.time()))
-    name = 'NVC_{}'.format(str(datetime))
+    if song_name is None:
+        datetime = time.strftime('%Y%m%d%H%M%S', time.localtime(time.time()))
+        name = 'NV_{}_chords'.format(str(datetime))
+    else:
+        name = song_name + '_chords'
     midi_path = MIDI_PATH + name + '.mid'
 
     # Save Separated Chords and Notes tracks, as we will need different instruments SoundFonts for each.
@@ -371,7 +374,7 @@ def create_midi_chords(duration, model_name):
     return name
 
 
-def create_midi_notes(duration, model_name):
+def create_midi_notes(duration, model_name, song_name=None):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     data_manager = DataManager()
@@ -443,8 +446,11 @@ def create_midi_notes(duration, model_name):
     midi_stream.insert(tempo.MetronomeMark('lofi', temp))
     midi_stream.insert(0, meter.TimeSignature('4/4'))
 
-    datetime = time.strftime('%Y%m%d%H%M%S', time.localtime(time.time()))
-    name = 'NV_{}'.format(str(datetime))
+    if song_name is None:
+        datetime = time.strftime('%Y%m%d%H%M%S', time.localtime(time.time()))
+        name = 'NV_{}_chords'.format(str(datetime))
+    else:
+        name = song_name
     midi_path = MIDI_PATH + name + '.mid'
 
     midi_stream.write('midi', fp=midi_path)
@@ -452,24 +458,81 @@ def create_midi_notes(duration, model_name):
     return name
 
 
+def music_generator_starter():
+    song_name = input('Provide the name of your song: ')
+    include_chords = input('Your song should contain both chords and melody? yes/no: ')
+
+    if include_chords == 'yes':
+        include_chords = True
+    else:
+        print('Ok, then just a melody...')
+        include_chords = False
+
+    instruments_mapper = InstrumentsMapper()
+    print("Available instruments:")
+    print(instruments_mapper.get_all_instruments_names())
+
+    melody_instrument = input('Select which instrument should play the melody in your song: ')
+    if include_chords:
+        chords_instrument = input('Select which instrument should play the chords in your song: ')
+    else:
+        chords_instrument = None
+
+    effects_mapper = EffectsMapper()
+    print("Available effects:")
+    print(effects_mapper.get_all_effect_names())
+
+    effects = input("Select effects separated by comma: ")
+    print('Alright, give me a sec! :D')
+
+    result_set = {'song_name': song_name,
+                  'include_chords': include_chords,
+                  'melody_instrument': melody_instrument,
+                  'chords_instrument': chords_instrument,
+                  'effects': effects}
+
+    return result_set
+
+
 if __name__ == '__main__':
 
     # possible modes: 'train_main', 'train_chords', 'generate_notes', 'generate_chords'
     mode = 'generate_chords'
 
-    if mode == 'train_main':
+    if len(sys.argv) > 1:
+        mode = sys.argv[1]
+
+    print(mode)
+
+    if mode == 'train_notes':
+        print('Notes model started training... Press Ctrl + C to stop')
         train_model()
+
     elif mode == 'train_chords':
+        print('Chords model started training... Press Ctrl + C to stop')
         train_chords_model()
     elif mode == 'generate_notes':
-        name = create_midi_notes(200, "fake_test_two_embeddings_2_7.9.pt")
-        midiWav = MidiToWav(PATH)
-        midiWav.set_name(name)
-        midiWav.midi_to_wav('dupa')
-        midiWav.post_effects('dupa')
+        name = create_midi_notes(GEN_SIZE, "fake_test_two_embeddings_2_7.9.pt")
     elif mode == 'generate_chords':
-        name = create_midi_chords(200, "chord_model_0.1.pt")
-        # midiWav = MidiToWav(PATH)
-        # midiWav.set_name(name)
-        # midiWav.midi_to_wav('dupa')
-        # midiWav.post_effects('dupa')
+        name = create_midi_chords(GEN_SIZE, "chord_model_0.1.pt")
+    elif mode == 'generate_music':
+        print('Welcome to Lofi music generator!')
+        user_choices = music_generator_starter()
+
+        notes_midi_name = create_midi_notes(GEN_SIZE, "fake_test_two_embeddings_2_7.9.pt",
+                                            user_choices['song_name'])
+        if user_choices['include_chords']:
+            chords_midi_name = create_midi_chords(GEN_SIZE, "chord_model_0.1.pt",
+                                                  user_choices['song_name'])
+
+        midi2Wav = MidiToWav(PATH)
+        midi2Wav.set_name(user_choices['song_name'])
+        midi2Wav.midi_to_wav(user_choices['melody_instrument'])
+
+        if user_choices['include_chords']:
+            midi2Wav.add_chords(user_choices['chords_instrument'], chords_midi_name)
+
+        midi2Wav.post_effects(user_choices['effects'].split(','))
+
+        print('All done! Check out the app/data/final_results dir!')
+
