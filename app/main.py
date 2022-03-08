@@ -70,7 +70,7 @@ def gen_notes_chords(model, seed, char2idx, idx2char, vocab_size, num_chars):
     return preds
 
 
-def gen_notes_two_embeddings(model_two_embeddings, num_chars):
+def gen_notes_three_embeddings(model_two_embeddings, num_chars):
     data_manager = DataManager()
 
     valocity_vocab_dict = data_manager.load_velocity_vocab_dicts()
@@ -89,16 +89,21 @@ def gen_notes_two_embeddings(model_two_embeddings, num_chars):
     inputs = MidiPreprocessor.prepare_sequence(seed, duration_vocab_dict['char2idx'],duration_vocab_dict['dur2idx'], velocity_vocab_dict['vel2idx'])
     x1 = inputs[0].reshape(1, len(inputs[0]))
     x2 = inputs[1].reshape(1, len(inputs[1]))
+    x3 = inputs[2].reshape(1, len(inputs[2]))
 
-    seed_pred, vel_pred, state = model_two_embeddings(x1, x2, state)
-    seed_pred = seed_pred.reshape(-1, duration_vocab_dict['note_dur_VOCAB_SIZE'])
+    seed_pred,dur_pred,vel_pred, state = model_three_embeddings(x1,x2,x3,state)
+
+    seed_pred = seed_pred.reshape(-1, duration_vocab_dict['VOCAB_SIZE'])
+    dur_pred= dur_pred.reshape(-1, duration_vocab_dict['dur_VOCAB_SIZE'])
     vel_pred = vel_pred.reshape(-1, valocity_vocab_dict['vel_VOCAB_SIZE'])
 
     preds = seed
     curr_pred = torch.topk(seed_pred[-1, :], k=1, dim=0)[1]
+    curr_pred_dur = torch.topk(dur_pred[-1, :], k=1, dim=0)[1]
     curr_pred_vel = torch.topk(vel_pred[-1, :], k=1, dim=0)[1]
 
-    curr_pred = duration_vocab_dict['idx2char_note_dur'][curr_pred.item()]
+    curr_pred = duration_vocab_dict['idx2char'][curr_pred.item()]
+    curr_pred_dur = duration_vocab_dict['idx2dur'][curr_pred_dur.item()]
     curr_pred_vel = valocity_vocab_dict['idx2vel'][curr_pred_vel.item()]
 
     preds.append("_".join([curr_pred, curr_pred_vel]))
@@ -121,20 +126,24 @@ def gen_notes_two_embeddings(model_two_embeddings, num_chars):
         curr_pred = MidiPreprocessor.prepare_sequence(seed, duration_vocab_dict['char2idx'],duration_vocab_dict['dur2idx'], velocity_vocab_dict['vel2idx'])
 
         curr_pred_note = curr_pred[0].reshape(1, len(curr_pred[0]))
-        curr_pred_vel = curr_pred[1].reshape(1, len(curr_pred[1]))
+        curr_pred_dur = curr_pred[1].reshape(1,len(curr_pred[1]))
+        curr_pred_vel = curr_pred[2].reshape(1, len(curr_pred[2]))
 
-        curr_pred, curr_pred_vel, state = model_two_embeddings(curr_pred_note, curr_pred_vel, state)
+        curr_pred,curr_pred_dur,curr_pred_vel, state = model_three_embeddings(curr_pred_note,curr_pred_dur,curr_pred_vel, state)
 
-        curr_pred = curr_pred.reshape(-1, duration_vocab_dict['note_dur_VOCAB_SIZE'])
+        curr_pred = curr_pred.reshape(-1, duration_vocab_dict['VOCAB_SIZE'])
+        curr_pred_dur= curr_pred_dur.reshape(-1, duration_vocab_dict['dur_VOCAB_SIZE'])
         curr_pred_vel = curr_pred_vel.reshape(-1, valocity_vocab_dict['vel_VOCAB_SIZE'])
 
         curr_pred = torch.topk(curr_pred[-1, :], k=1, dim=0)[1]
+        curr_pred_dur = torch.topk(curr_pred_dur[-1, :], k=1, dim=0)[1]
         curr_pred_vel = torch.topk(curr_pred_vel[-1, :], k=1, dim=0)[1]
 
-        curr_pred = duration_vocab_dict['idx2char_note_dur'][curr_pred.item()]
+        curr_pred = duration_vocab_dict['idx2char'][curr_pred.item()]
+        curr_pred_dur = duration_vocab_dict['idx2dur'][curr_pred_dur.item()]
         curr_pred_vel = valocity_vocab_dict['idx2vel'][curr_pred_vel.item()]
 
-        preds.append("_".join([curr_pred, curr_pred_vel]))
+        preds.append("_".join([curr_pred,curr_pred_dur,curr_pred_vel]))
     return preds
 
 
