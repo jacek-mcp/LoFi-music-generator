@@ -38,11 +38,12 @@ def intersection(lst1, lst2):
     return lst3
 
 
-def gen_notes_two_embeddings(model_two_embeddings, num_chars):
+def gen_notes_three_embeddings(model_three_embeddings, num_chars):
     data_manager = DataManager()
 
     valocity_vocab_dict = data_manager.load_velocity_vocab_dicts()
-    duration_vocab_dict = data_manager.load_notes_durations_vocab_dicts()
+    duration_vocab_dict = data_manager.load_duration_vocab_dicts()
+    notes_vocab_dict = data_manager.load_notes_vocab_dicts()
     duration_velocity_vocab_dict = data_manager.load_notes_duration_velocity_vocab_dicts()
 
     list_of_first_notes = None
@@ -52,59 +53,66 @@ def gen_notes_two_embeddings(model_two_embeddings, num_chars):
     seed = list_of_first_notes
     preds = None
 
-    model_two_embeddings.eval()
+    model_three_embeddings.eval()
     state = None
-    inputs = MidiPreprocessor.prepare_sequence(seed, valocity_vocab_dict['vel2idx'],
-                                               duration_vocab_dict['char2idx_note_dur'])
+    inputs = MidiPreprocessor.prepare_sequence(seed, notes_vocab_dict['char2idx'], duration_vocab_dict['dur2idx'],
+                                               valocity_vocab_dict['vel2idx'])
     x1 = inputs[0].reshape(1, len(inputs[0]))
     x2 = inputs[1].reshape(1, len(inputs[1]))
+    x3 = inputs[2].reshape(1, len(inputs[2]))
 
-    seed_pred, vel_pred, state = model_two_embeddings(x1, x2, state)
-    seed_pred = seed_pred.reshape(-1, duration_vocab_dict['note_dur_VOCAB_SIZE'])
+    seed_pred, dur_pred, vel_pred, state = model_three_embeddings(x1, x2, x3,state)
+    seed_pred = seed_pred.reshape(-1, notes_vocab_dict['VOCAB_SIZE'])
+    dur_pred = dur_pred.reshape(-1, duration_vocab_dict['dur_VOCAB_SIZE'])
     vel_pred = vel_pred.reshape(-1, valocity_vocab_dict['vel_VOCAB_SIZE'])
 
     preds = seed
     curr_pred = torch.topk(seed_pred[-1, :], k=1, dim=0)[1]
+    curr_pred_dur = torch.topk(dur_pred[-1, :], k=1, dim=0)[1]
     curr_pred_vel = torch.topk(vel_pred[-1, :], k=1, dim=0)[1]
 
-    curr_pred = duration_vocab_dict['idx2char_note_dur'][curr_pred.item()]
+    curr_pred = notes_vocab_dict['idx2char'][curr_pred.item()]
+    curr_pred_dur = duration_vocab_dict['idx2dur'][curr_pred_dur.item()]
     curr_pred_vel = valocity_vocab_dict['idx2vel'][curr_pred_vel.item()]
 
-    preds.append("_".join([curr_pred, curr_pred_vel]))
+    preds.append("_".join([curr_pred, curr_pred_dur, curr_pred_vel]))
+
     for t in range(num_chars):
         if len(intersection(preds[-4:], preds[-8:-4])) / len(preds[-4:]) >= 0.75:
             # print("random1")
-            random_note = np.random.randint(0, len([x for x in
-                                                    duration_velocity_vocab_dict['char2idx_note_dur_vel'].keys()]))
-            curr_pred = [x for x in duration_velocity_vocab_dict['char2idx_note_dur_vel'].keys()][
-                random_note]  # or always same random_notes
+            random_note = np.random.randint(0, len([x for x in duration_velocity_vocab_dict['char2idx_note_dur_vel'].keys()]))
+            curr_pred = [x for x in duration_velocity_vocab_dict['char2idx_note_dur_vel'].keys()][random_note]  # or always same random_notes
         elif len(intersection(preds[-8:], preds[-16:-8])) / len(preds[-8:]) >= 0.75:
             # print("random2")
-            random_note = np.random.randint(0, len([x for x in
-                                                    duration_velocity_vocab_dict['char2idx_note_dur_vel'].keys()]))
-            curr_pred = [x for x in duration_velocity_vocab_dict['char2idx_note_dur_vel'].keys()][
-                random_note]  # or always same random_notes
+            random_note = np.random.randint(0, len([x for x in duration_velocity_vocab_dict['char2idx_note_dur_vel'].keys()]))
+            curr_pred = [x for x in duration_velocity_vocab_dict['char2idx_note_dur_vel'].keys()][random_note]  # or always same random_notes
         else:
-            curr_pred = curr_pred
-            # print(curr_pred)
-        curr_pred = MidiPreprocessor.prepare_sequence(seed, valocity_vocab_dict['vel2idx'],
-                                                      duration_vocab_dict['char2idx_note_dur'])
+            curr_pred = "_".join([curr_pred, curr_pred_dur, curr_pred_vel])
+
+        curr_pred = MidiPreprocessor.prepare_sequence([curr_pred], notes_vocab_dict['char2idx'], duration_vocab_dict['dur2idx'],
+                                          valocity_vocab_dict['vel2idx'])
 
         curr_pred_note = curr_pred[0].reshape(1, len(curr_pred[0]))
-        curr_pred_vel = curr_pred[1].reshape(1, len(curr_pred[1]))
+        curr_pred_dur = curr_pred[1].reshape(1, len(curr_pred[1]))
+        curr_pred_vel = curr_pred[2].reshape(1, len(curr_pred[2]))
 
-        curr_pred, curr_pred_vel, state = model_two_embeddings(curr_pred_note, curr_pred_vel, state)
+        curr_pred, curr_pred_dur, curr_pred_vel, state = model_three_embeddings(curr_pred_note, curr_pred_dur,
+                                                                                curr_pred_vel, state)
 
-        curr_pred = curr_pred.reshape(-1, duration_vocab_dict['note_dur_VOCAB_SIZE'])
+        curr_pred = curr_pred.reshape(-1, notes_vocab_dict['VOCAB_SIZE'])
+        curr_pred_dur = curr_pred_dur.reshape(-1, duration_vocab_dict['dur_VOCAB_SIZE'])
         curr_pred_vel = curr_pred_vel.reshape(-1, valocity_vocab_dict['vel_VOCAB_SIZE'])
 
         curr_pred = torch.topk(curr_pred[-1, :], k=1, dim=0)[1]
+        curr_pred_dur = torch.topk(curr_pred_dur[-1, :], k=1, dim=0)[1]
         curr_pred_vel = torch.topk(curr_pred_vel[-1, :], k=1, dim=0)[1]
 
-        curr_pred = duration_vocab_dict['idx2char_note_dur'][curr_pred.item()]
+        curr_pred = notes_vocab_dict['idx2char'][curr_pred.item()]
+        curr_pred_dur = duration_vocab_dict['idx2dur'][curr_pred_dur.item()]
         curr_pred_vel = valocity_vocab_dict['idx2vel'][curr_pred_vel.item()]
 
-        preds.append("_".join([curr_pred, curr_pred_vel]))
+        preds.append("_".join([curr_pred, curr_pred_dur, curr_pred_vel]))
+
     return preds
 
 
@@ -378,12 +386,17 @@ def create_midi_notes(duration, model_name, song_name=None):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     data_manager = DataManager()
-    dvd = data_manager.load_notes_durations_vocab_dicts()
-    vvd = data_manager.load_velocity_vocab_dicts()
-    model_two_embeddings = LSTMT.LSTMT_2embeddings(dvd['note_dur_VOCAB_SIZE'],
-                                                   vvd['vel_VOCAB_SIZE']).to(device)
-    model_two_embeddings.load_state_dict(torch.load(MODELS_PATH + model_name))
-    preds_notes = gen_notes_two_embeddings(model_two_embeddings, duration)
+
+
+    #TODO fix typo
+    valocity_vocab_dict = data_manager.load_velocity_vocab_dicts()
+    duration_vocab_dict = data_manager.load_duration_vocab_dicts()
+    notes_vocab_dict = data_manager.load_notes_vocab_dicts()
+
+    model_three_embeddings = LSTMT.LSTMT_3embeddings(notes_vocab_dict['VOCAB_SIZE'], duration_vocab_dict['dur_VOCAB_SIZE'],
+                                                     valocity_vocab_dict['vel_VOCAB_SIZE']).to(device)
+    model_three_embeddings.load_state_dict(torch.load(MODELS_PATH + model_name))
+    preds_notes = gen_notes_three_embeddings(model_three_embeddings, duration)
 
     offset = 0
     # TODO set the same tempo for chords and notes
@@ -511,15 +524,14 @@ if __name__ == '__main__':
     elif mode == 'train_chords':
         print('Chords model started training... Press Ctrl + C to stop')
         train_chords_model()
-    elif mode == 'generate_notes':
-        name = create_midi_notes(GEN_SIZE, "fake_test_two_embeddings_2_7.9.pt")
-    elif mode == 'generate_chords':
-        name = create_midi_chords(GEN_SIZE, "chord_model_0.1.pt")
+    elif mode == 'test':
+        notes_midi_name = create_midi_notes(GEN_SIZE, "big_test_THREE_embeddings_0.9.pt",
+                                            'dupa')
     elif mode == 'generate_music':
         print('Welcome to Lofi music generator!')
         user_choices = music_generator_starter()
 
-        notes_midi_name = create_midi_notes(GEN_SIZE, "fake_test_two_embeddings_2_7.9.pt",
+        notes_midi_name = create_midi_notes(GEN_SIZE, "big_test_THREE_embeddings_0.9.pt",
                                             user_choices['song_name'])
         if user_choices['include_chords']:
             chords_midi_name = create_midi_chords(GEN_SIZE, "chord_model_0.1.pt",
@@ -535,4 +547,3 @@ if __name__ == '__main__':
         midi2Wav.post_effects(user_choices['effects'].split(','))
 
         print('All done! Check out the app/data/final_results dir!')
-

@@ -12,8 +12,8 @@ class DataLoaderHandler:
 
     def get_note_velocity_loaders(self, data):
 
-        BATCH_SIZE = 135
-        SEQ_LEN = 32  # , 70, 80,
+        BATCH_SIZE = 219
+        SEQ_LEN = 100  # , 70, 80,
 
         train_set = []
 
@@ -32,14 +32,14 @@ class DataLoaderHandler:
         for seq in train_set:
             X = seq[:-1]
             Y = seq[1:]
-            X = MidiPreprocessor.prepare_sequence(X, velocity_vocab_dict['vel2idx'], duration_vocab_dict['char2idx_note_dur'])  # no onehot encoding.
-            Y = MidiPreprocessor.prepare_sequence(Y, velocity_vocab_dict['vel2idx'], duration_vocab_dict['char2idx_note_dur'])  # no onehot encoding.
+            X = MidiPreprocessor.prepare_sequence(X, duration_vocab_dict['char2idx'], duration_vocab_dict['dur2idx'],velocity_vocab_dict['vel2idx'])  # no onehot encoding.
+            Y = MidiPreprocessor.prepare_sequence(Y, duration_vocab_dict['char2idx'], duration_vocab_dict['dur2idx'],velocity_vocab_dict['vel2idx'])  # no onehot encoding.
 
             dataX.append(torch.stack(X))
             dataY.append(torch.stack(Y))
 
-        dataloaderX = DataLoader(dataX[:1620], batch_size=BATCH_SIZE, shuffle=False)  # batch_size=32,shuffle )
-        dataloaderY = DataLoader(dataY[:1620], batch_size=BATCH_SIZE, shuffle=False)
+        dataloaderX = DataLoader(dataX[:], batch_size=BATCH_SIZE, shuffle=False)  # batch_size=32,shuffle )
+        dataloaderY = DataLoader(dataY[:], batch_size=BATCH_SIZE, shuffle=False)
         return dataloaderX, dataloaderY
 
     def get_chord_loaders(self, data):
