@@ -393,8 +393,8 @@ def create_midi_notes(duration, model_name, song_name=None):
     duration_vocab_dict = data_manager.load_duration_vocab_dicts()
     notes_vocab_dict = data_manager.load_notes_vocab_dicts()
 
-    model_three_embeddings = LSTMT.LSTMT_3embeddings(notes_vocab_dict['char2idx'], duration_vocab_dict['dur2idx'],
-                                                     valocity_vocab_dict['vel2idx']).to(device)
+    model_three_embeddings = LSTMT.LSTMT_3embeddings(notes_vocab_dict['VOCAB_SIZE'], duration_vocab_dict['dur_VOCAB_SIZE'],
+                                                     valocity_vocab_dict['vel_VOCAB_SIZE']).to(device)
     model_three_embeddings.load_state_dict(torch.load(MODELS_PATH + model_name))
     preds_notes = gen_notes_three_embeddings(model_three_embeddings, duration)
 
@@ -524,6 +524,9 @@ if __name__ == '__main__':
     elif mode == 'train_chords':
         print('Chords model started training... Press Ctrl + C to stop')
         train_chords_model()
+    elif mode == 'test':
+        notes_midi_name = create_midi_notes(GEN_SIZE, "big_test_THREE_embeddings_0.9.pt",
+                                            'dupa')
     elif mode == 'generate_music':
         print('Welcome to Lofi music generator!')
         user_choices = music_generator_starter()

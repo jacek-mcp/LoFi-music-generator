@@ -59,23 +59,23 @@ class DataManager:
     #     return result_set
 
     def load_formatted_data(self):
-        with open(self.path + 'big_anime_final_notes_dur_note_vel',
+        with open(self.path + 'big_anime_final_notes_dur_note_vel_v2',
                   'rb') as filepath:  # big_anime_final_notes_dur_note_vel_v2
             notes_duration_note_velocity_formatted_v2 = pickle.load(filepath)
 
-        with open(self.path + 'big_anime_final_notes_dur_vel', 'rb') as filepath:  # big_anime_final_notes_dur_vel_v2
+        with open(self.path + 'big_anime_final_notes_dur_vel_v2', 'rb') as filepath:  # big_anime_final_notes_dur_vel_v2
             notes_duration_velocity_formatted_v2 = pickle.load(filepath)
 
-        with open(self.path + 'big_anime_final_notes_dur', 'rb') as filepath:  # big_anime_final_notes_dur_v2
+        with open(self.path + 'big_anime_final_notes_dur_v2', 'rb') as filepath:  # big_anime_final_notes_dur_v2
             notes_duration_formatted_v2 = pickle.load(filepath)
 
-        with open(self.path + 'big_anime_final_notes_vel', 'rb') as filepath:  # big_anime_final_notes_vel_v2
+        with open(self.path + 'big_anime_final_notes_vel_v2', 'rb') as filepath:  # big_anime_final_notes_vel_v2
             notes_velocity_formatted_v2 = pickle.load(filepath)
 
-        with open(self.path + 'big_anime_final_vel', 'rb') as filepath:  # big_anime_final_vel_v2
+        with open(self.path + 'big_anime_final_vel_v2', 'rb') as filepath:  # big_anime_final_vel_v2
             velocity_list_formatted_v2 = pickle.load(filepath)
 
-        with open(self.path + 'small_anime_final_chord_dur', 'rb') as filepath:  # big_anime_final_chord_dur_v2
+        with open(self.path + 'big_anime_final_chord_dur_v2', 'rb') as filepath:  # big_anime_final_chord_dur_v2
             chords_duration_formatted_v2 = pickle.load(filepath)
 
         with open(self.path + 'big_anime_final_notes_v2', 'rb') as filepath:
@@ -157,13 +157,13 @@ class DataManager:
         return vel2idx, idx2vel, vel_VOCAB_SIZE
 
     def load_velocity_vocab_dicts(self):
-        with open(self.path + 'small_vel2idx', 'rb') as filepath:
+        with open(self.path + 'big_vel2idx', 'rb') as filepath:
             vel2idx = pickle.load(filepath)
 
-        with open(self.path + 'small_idx2vel', 'rb') as filepath:
+        with open(self.path + 'big_idx2vel', 'rb') as filepath:
             idx2vel = pickle.load(filepath)
 
-        with open(self.path + 'small_vel_VOCAB_SIZE', 'rb') as filepath:
+        with open(self.path + 'big_vel_VOCAB_SIZE', 'rb') as filepath:
             vel_VOCAB_SIZE = pickle.load(filepath)
 
         result_set = {'vel2idx': vel2idx,
@@ -293,15 +293,15 @@ class DataManager:
         return result_set
 
     def load_notes_vocab_dicts(self):
-        with open(self.path + 'big_char2idx', 'rb') as filepath:
+        with open(self.path + 'big_char2idx_v2', 'rb') as filepath:
             # with open('data/lofi_notes_velocity', 'rb') as filepath:
             char2idx = pickle.load(filepath)
 
-        with open(self.path + 'big_idx2char', 'rb') as filepath:
+        with open(self.path + 'big_idx2char_v2', 'rb') as filepath:
             # with open('data/lofi_notes_velocity', 'rb') as filepath:
             idx2char = pickle.load(filepath)
 
-        with open(self.path + 'big_VOCAB_SIZE', 'rb') as filepath:
+        with open(self.path + 'big_VOCAB_SIZE_v2', 'rb') as filepath:
             # with open('data/lofi_notes_velocity', 'rb') as filepath:
             VOCAB_SIZE = pickle.load(filepath)
 
@@ -388,13 +388,13 @@ class DataManager:
         return result_set
 
     def load_notes_duration_velocity_vocab_dicts(self):
-        with open(self.path + 'small_char2idx_note_dur_vel', 'rb') as filepath:
+        with open(self.path + 'big_char2idx_note_dur_vel', 'rb') as filepath:
             char2idx_note_dur_vel = pickle.load(filepath)
 
-        with open(self.path + 'small_idx2char_note_dur_vel', 'rb') as filepath:
+        with open(self.path + 'big_idx2char_note_dur_vel', 'rb') as filepath:
             idx2char_note_dur_vel = pickle.load(filepath)
 
-        with open(self.path + 'small_note_dur_vel_VOCAB_SIZE', 'rb') as filepath:
+        with open(self.path + 'big_note_dur_vel_VOCAB_SIZE', 'rb') as filepath:
             note_dur_vel_VOCAB_SIZE = pickle.load(filepath)
 
         result_set = {'char2idx_note_dur_vel': char2idx_note_dur_vel,
