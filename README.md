@@ -12,8 +12,8 @@ Table of Contents
 		* [Data augmentation](#data-augmentation---trial-i)
   * [END TO END SYSTEM](#end-to-end-system)
   * [Prerequisites](#prerequisites)
-  * [Build & Run](#build-&-run)
-  * [How to add your post effects & instruments](#how-to-add-your-post-effects-&-instruments)
+  * [Build & Run](#build-run)
+  * [How to add your post effects & instruments](#how-to-add-your-post-effects-instruments)
 	 
 
 ## About The Project
