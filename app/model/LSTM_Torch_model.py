@@ -2,13 +2,16 @@ import torch
 
 
 class LSTMT_3embeddings(torch.nn.Module):
+
     def __init__(self, vocab_size, dur_vocab_size, velocities_vocab_size):
+
         super(LSTMT_3embeddings, self).__init__()
         hidden_dim = 512
         embbeding_dim = 64
         self.encoder = torch.nn.Embedding(vocab_size, embbeding_dim)
         self.encoder_dur = torch.nn.Embedding(dur_vocab_size, embbeding_dim)
         self.encoder_vel = torch.nn.Embedding(velocities_vocab_size, embbeding_dim)
+
 
         self.drop = torch.nn.Dropout(0.3)  # , 0.3, 0.5
         self.lstm = torch.nn.LSTM(embbeding_dim, hidden_dim,
@@ -19,6 +22,7 @@ class LSTMT_3embeddings(torch.nn.Module):
         self.decoder_vel = torch.nn.Linear(hidden_dim, velocities_vocab_size)
 
         self.soft = torch.nn.LogSoftmax(dim=-1)
+
 
     def forward(self, x1, x2, x3, state=None):
         embeds = self.encoder(x1)

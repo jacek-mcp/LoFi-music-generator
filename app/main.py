@@ -55,8 +55,10 @@ def gen_notes_three_embeddings(model_three_embeddings, num_chars):
 
     model_three_embeddings.eval()
     state = None
+
     inputs = MidiPreprocessor.prepare_sequence(seed, notes_vocab_dict['char2idx'], duration_vocab_dict['dur2idx'],
                                                valocity_vocab_dict['vel2idx'])
+
     x1 = inputs[0].reshape(1, len(inputs[0]))
     x2 = inputs[1].reshape(1, len(inputs[1]))
     x3 = inputs[2].reshape(1, len(inputs[2]))
@@ -87,6 +89,7 @@ def gen_notes_three_embeddings(model_three_embeddings, num_chars):
             random_note = np.random.randint(0, len([x for x in duration_velocity_vocab_dict['char2idx_note_dur_vel'].keys()]))
             curr_pred = [x for x in duration_velocity_vocab_dict['char2idx_note_dur_vel'].keys()][random_note]  # or always same random_notes
         else:
+
             curr_pred = "_".join([curr_pred, curr_pred_dur, curr_pred_vel])
 
         curr_pred = MidiPreprocessor.prepare_sequence([curr_pred], notes_vocab_dict['char2idx'], duration_vocab_dict['dur2idx'],

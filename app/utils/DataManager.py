@@ -5,6 +5,7 @@ import os
 class DataManager:
 
     def __init__(self):
+
         self.path = os.getcwd() + '/data/data/'
 
     # def format_and_save_final_data(self, notes_list, duration_list_formatted, velocity_list_formatted, chords_notes,
@@ -76,7 +77,15 @@ class DataManager:
             velocity_list_formatted_v2 = pickle.load(filepath)
 
         with open(self.path + 'big_anime_final_chord_dur_v2', 'rb') as filepath:  # big_anime_final_chord_dur_v2
+
             chords_duration_formatted_v2 = pickle.load(filepath)
+            
+  
+        with open(self.path + 'big_anime_final_notes_v2', 'rb') as filepath: 
+            notes_formatted_v2 = pickle.load(filepath)
+            
+        with open(self.path + 'big_anime_final_duration_v2', 'rb') as filepath: 
+            duration_formatted_v2 = pickle.load(filepath)
 
         with open(self.path + 'big_anime_final_notes_v2', 'rb') as filepath:
             notes_formatted_v2 = pickle.load(filepath)
@@ -263,6 +272,107 @@ class DataManager:
                       'note_dur_VOCAB_SIZE': note_dur_VOCAB_SIZE}
 
         return result_set
+    
+  
+    
+    def create_and_save_notes_vocab_dicts(self, notes_formatted_v2):
+        # merge the training data into one big text line
+
+        training_data = [notes_formatted_v2]
+        char2idx = {}
+        for sent in training_data:
+            for c in sent:
+                if c not in char2idx:
+                    char2idx[c] = len(char2idx)
+        idx2char = dict((v, k) for k, v in char2idx.items())
+        VOCAB_SIZE = len(char2idx)
+        print('Number of found vocabulary tokens: ', VOCAB_SIZE)
+
+        with open(self.path + 'big_char2idx', 'wb') as filepath:
+            pickle.dump(char2idx, filepath)
+
+        with open(self.path + 'big_idx2char', 'wb') as filepath:
+            pickle.dump(idx2char, filepath)
+
+        with open(self.path + 'big_VOCAB_SIZE', 'wb') as filepath:
+            pickle.dump(VOCAB_SIZE, filepath)
+
+        result_set = {'char2idx': char2idx,
+                      'idx2char': idx2char,
+                      'VOCAB_SIZE': VOCAB_SIZE}
+
+        return result_set
+
+    def load_notes_vocab_dicts(self):
+        with open(self.path + 'big_char2idx', 'rb') as filepath:
+            # with open('data/lofi_notes_velocity', 'rb') as filepath:
+            char2idx = pickle.load(filepath)
+
+        with open(self.path + 'big_idx2char', 'rb') as filepath:
+            # with open('data/lofi_notes_velocity', 'rb') as filepath:
+            idx2char = pickle.load(filepath)
+
+        with open(self.path + 'big_VOCAB_SIZE', 'rb') as filepath:
+            # with open('data/lofi_notes_velocity', 'rb') as filepath:
+            VOCAB_SIZE = pickle.load(filepath)
+
+        result_set = {'char2idx': char2idx_note_dur,
+                      'idx2char': idx2char_note_dur,
+                      'VOCAB_SIZE': note_dur_VOCAB_SIZE}
+
+        return result_set
+  
+    
+    
+    def create_and_save_duration_vocab_dicts(self, duration_formatted_v2):
+        # merge the training data into one big text line
+
+        training_data = [duration_formatted_v2]
+        dur2idx = {}
+        for sent in training_data:
+            for c in sent:
+                if c not in dur2idx:
+                    dur2idx[c] = len(dur2idx)
+        idx2dur = dict((v, k) for k, v in dur2idx.items())
+        dur_VOCAB_SIZE = len(dur2idx)
+        print('Number of found vocabulary tokens: ', dur_VOCAB_SIZE)
+
+        with open(self.path + 'big_dur2idx', 'wb') as filepath:
+            pickle.dump(dur2idx, filepath)
+
+        with open(self.path + 'big_idx2dur', 'wb') as filepath:
+            pickle.dump(idx2dur, filepath)
+
+        with open(self.path + 'big_dur_VOCAB_SIZE', 'wb') as filepath:
+            pickle.dump(dur_VOCAB_SIZE, filepath)
+
+        result_set = {'dur2idx': dur2idx,
+                      'idx2dur': idx2dur,
+                      'dur_VOCAB_SIZE': dur_VOCAB_SIZE}
+
+        return result_set
+
+    def load_duration_vocab_dicts(self):
+        with open(self.path + 'big_dur2idx', 'rb') as filepath:
+            # with open('data/lofi_notes_velocity', 'rb') as filepath:
+            dur2idx = pickle.load(filepath)
+
+        with open(self.path + 'big_idx2dur', 'rb') as filepath:
+            # with open('data/lofi_notes_velocity', 'rb') as filepath:
+            idx2dur = pickle.load(filepath)
+
+        with open(self.path + 'big_dur_VOCAB_SIZE', 'rb') as filepath:
+            # with open('data/lofi_notes_velocity', 'rb') as filepath:
+            dur_VOCAB_SIZE = pickle.load(filepath)
+
+        result_set = {'dur2idx': dur2idx,
+                      'idx2dur': idx2dur,
+                      'dur_VOCAB_SIZE': dur_VOCAB_SIZE}
+
+        return result_set
+  
+    
+    
 
     def create_and_save_notes_vocab_dicts(self, notes_formatted_v2):
         # merge the training data into one big text line
