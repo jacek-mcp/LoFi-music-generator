@@ -10,7 +10,7 @@ Table of Contents
 	     * [LSTM](#classifier-neural-network)
 	 * [MODEL IMPROVEMENTS](#model-improvements)
 		* [Data augmentation](#data-augmentation---trial-i)
-  * [END TO END SYSTEM](#end-to-end-system)
+  * [End to end generator](#end-to-end-generator)
   * [Prerequisites](#prerequisites)
   * [Build & Run](#build--run)
   * [How to add your post effects & instruments](#how-to-add-your-post-effects--instruments)
@@ -23,9 +23,15 @@ The generation engine is made of two recurrent neural networks. One is responsib
 
 blah blah blah
 
+## End to end generator
+
+The project generates unique melody and chords which are mastered by adding a typical for Lofi beats and background noises. Both chords and melody can be played by any instrument provided in [sf2](https://en.wikipedia.org/wiki/SoundFont) format. Additionally the system allows to add an inifnite (reasonable) number of post effects like rain, beats etc. in a wav format. Check [How to add your post effects & instruments](#how-to-add-your-post-effects--instruments). 
+
+The program uses the above DNNs to generate midi files with chords and melody. You can find both files in a data/midi directory. Then the midi files are changed to WAV format by [FluidSynth](https://pypi.org/project/pyFluidSynth/). You can find the melody and chords in a wav format in data/wav directory. Then the posteffects are added by [AudioSegment](https://audiosegment.readthedocs.io/en/latest/audiosegment.html) simply overlaying one track over another. 
+
 ## Prerequisites
 
-* Python 3.7
+* Python 3.7+
 * pip
 * venv
 
