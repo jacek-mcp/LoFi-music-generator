@@ -1,6 +1,21 @@
 # LoFi-music-generator
 An open-sourced Lofi hip-hop music generation project for UPC. 
 
+Table of Contents
+=================
+
+  * [About The Project](#introduction-and-motivation)
+  * [DATASET](#dataset)
+  * [ARCHITECTURES](#architecture-and-results)
+	     * [LSTM](#classifier-neural-network)
+	 * [MODEL IMPROVEMENTS](#model-improvements)
+		* [Data augmentation](#data-augmentation---trial-i)
+  * [END TO END SYSTEM](#end-to-end-system)
+  * [Prerequisites](#prerequisites)
+  * [Build & Run](#build-&-run)
+  * [How to add your post effects & instruments](#how-to-add-your-post-effects-&-instruments)
+	 
+
 ## About The Project
 lorem ipsum blah blah blah
 
