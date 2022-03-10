@@ -17,11 +17,20 @@ Table of Contents
 	 
 
 ## About The Project
-lorem ipsum blah blah blah
 
-The generation engine is made of two recurrent neural networks. One is responsible for generating the melody, second for the chords.
+The goal of this project is to build an artificial intelligence model capable of composing and producing music. With this model, we pretend to create audio that can be categorized in a music genre. Specifically, we use LoFi as the main genre category for our experiments.
 
-blah blah blah
+With this in mind, we try to generate LoFi music tracks, clearly differentiated from sound or noise, that sound as much similar as possible to human generated tracks.
+
+The principal task of the project is to generate recurrently the next note of the track, or in other words, generate sequences. This gives us a first idea about which kind of neural network is needed to solve the task.
+
+In the same way, it's required to generate chords (groups of three or more notes that sound at the same time) and also to introduce as features silences and the durations of the notes.
+
+Moreover, it's needed to apply some post-production process in order to tune the results with typical sounds of Lo-Fi music such as a characteristic beat or the sound of the rain.
+
+Furthermore, it's desired to upload some of the generated tracks in a streaming platform in order to make it accesible to anyone and also to allow us to determine the evaluation of the results.
+
+Our approach proposes a generation engine made of two recurrent neural networks. One is responsible for generating the melody, second for the chords.
 
 ## End to end generator
 
