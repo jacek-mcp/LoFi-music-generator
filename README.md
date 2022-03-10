@@ -101,7 +101,9 @@ While the two embeddings and three embeddings overfitting lines stay flatten.
 * Take out 2: Model 3 predicts predicts more original songs (less overfitting)
 
 1 Embedding model: A big vocabulary may not impact the model in terms of predicting different notes, since you have one unique embedding for all three features, it's easier for the model to overfit and predict the right sequence.
+
 2 embeddings model: with medium size vocabulary of notes and durations, the diversity of notes and durations is higher, as you have an index vocab of repeated notes with different durations, and therefore the model might find it harder to understand the next note. (ends up predicting one sequence over and over.)
+
 3 embeddings model: One small vocabulary for each feature proves a better result, seems to make the model hard to get repetitive as there is a diverse unique vocabulary of only notes, therefore the model have more clear decisioning on which note comes next, as there are fewer unique notes.
 
 ## Prerequisites
