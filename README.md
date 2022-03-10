@@ -47,6 +47,8 @@ It was quite difficult to manage this data as we didn't had experience with audi
 
 MIDI  is a technical standard that describes a communications protocol, digital interface, and electrical connectors that connect a wide variety of electronic musical instruments, computers, and related audio devices for playing, editing, and recording music. MIDI files contains relevant information about the songs, not only the notes, but their duration, velocity, tempo, instrument, scale among much more.
 
+![image](https://github.com//jacek-mcp/LoFi-music-generator/blob/main/TheCodebuzz.png?raw=true)
+
 ### Preprocessing:
 From the Midi files we
 
@@ -57,8 +59,6 @@ From the Midi files we
 * Create index vocabularies. 
 * Converted sequences of notes into index sequences to feed the model.
 * Create batches of sequences of indexes of size 100.
-
-[IMGage]
 
 
 ## Hypothesis
