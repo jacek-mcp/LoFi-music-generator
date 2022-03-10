@@ -120,6 +120,19 @@ While the two embeddings and three embeddings overfitting lines stay flatten.
 
 It is strongly recommended running the project in a [Virtual env](https://docs.python.org/3/tutorial/venv.html)
 
+### FluidSynth installation
+
+Debian based linux
+ ```sh
+  sudo apt update
+  sudo apt install fluidsynth
+  ```
+MacOS
+ ```sh
+  brew install fluid-synth
+  ```
+
+
 ## Build & Run
 
 
