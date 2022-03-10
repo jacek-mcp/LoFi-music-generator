@@ -76,6 +76,7 @@ Also trained an independent Chord model. Which results are concatenated to the m
 
 ![image](https://github.com/jacek-mcp/LoFi-music-generator/blob/main/Screenshot%202022-03-10%20at%2002.07.49.png?raw=true)
 
+## Results
 As you might imagine this is not a typical classification task, we want to generate new improvised songs based on big training date of complex songs. To avoid the model predicting the exact same songs that have been trained for, we need to assess different losses and see how high is their overfitting in terms of predicting original songs and the quality of the predictions.
 
 A high loss might result in absence of overfitting but produce extremely disonant results or repetitive sequences. On the other hand, a low loss might result in good results but very similar or identical to original songs, therefore the effort here is to select a loss that predicts good sounds while maintaining a low overfitting line.
