@@ -90,6 +90,7 @@ class MidiToWav:
             sound = sound.overlay(AudioSegment.from_file(self.effects_path +
                                                          self.effects_mapper.get_effect_file_name(effect)))
 
+        print("Effects added!")
         sound.export(self.final_result_path + self.name + '.wav', format='wav')
 
     def set_name(self, name):
