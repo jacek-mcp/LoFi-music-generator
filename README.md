@@ -69,7 +69,7 @@ The result was gigant vocabulary, almost 10000 indexes, this could make the mode
 
 * 2.The next approach we took following our intuition was to add complexity by joining notes and durations into one single index vocabulary and having an isolated vocabulary for velocities, with two corresponding embedding layers. 2nd graph
 
-* 3. After reviewing the results, we decided go further and try with one vocabulary by feature, therefore, 3. 3rd graph
+* 3.After reviewing the results, we decided go further and try with one vocabulary by feature, therefore, 3. 3rd graph
 Also trained an independent Chord model. Which results are concatenated to the main model predictions at the postproduction process adjusting the temp, the time signature and so on.
 
 [IMAGE]
