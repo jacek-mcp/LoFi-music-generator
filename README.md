@@ -89,11 +89,14 @@ y axis: percentage of matching notes within the current sequence and the previou
 
 ![image](https://github.com/jacek-mcp/LoFi-music-generator/blob/main/Screenshot%202022-03-10%20at%2002.10.05.png?raw=true)
 
+
 The single embeddding's low repetitiveness is related to the fact that the model tends to predict exactly the same  fragments of the training data instead of improvising, overfitting.
 
 See green line, around 30% of the predicted sequences higher than 15 notes, matches sequences of the training data.
 
 While the two embeddings and three embeddings overfitting lines stay flatten.
+
+![image](https://github.com/jacek-mcp/LoFi-music-generator/blob/main/Screenshot%202022-03-10%20at%2002.11.53.png?raw=true)
 
 
 ## Conclusions
