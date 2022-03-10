@@ -60,7 +60,8 @@ From the Midi files we
 
 
 ![image description](https://github.com/jacek-mcp/LoFi-music-generator/blob/main/Screenshot 2022-03-10 at 01.48.20.png?raw=true)
-![Screenshot](Screenshot 2022-03-10 at 01.48.20.png)
+
+
 ![My Image](/Users/brunopizzani/Desktop/Screenshot 2022-03-10 at 01.48.20.png)
 
 
