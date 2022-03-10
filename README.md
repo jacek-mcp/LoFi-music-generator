@@ -4,8 +4,8 @@ An open-sourced Lofi hip-hop music generation project for UPC.
 Table of Contents
 =================
 
-  * [About The Project](#introduction-and-motivation)
-  * [Data & Data Processing](#data--data-rocessing)
+  * [About The Project](#about-the-project)
+  * [Data & Data Processing](#data--data-processing)
   * [Preprocessing](#preprocessing)
   * [Hypothesis](#hypothesis)
   * [Architectures](#architectures)
