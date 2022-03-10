@@ -64,12 +64,12 @@ The original idea was to create a LSTM model that predicts sequences of not only
 
 ## Arquitectures
 
-1.The most straightforward approach was to have a huge index vocabulary of each note, its duration and its velocity, which is the first image on the left.
+* 1.The most straightforward approach was to have a huge index vocabulary of each note, its duration and its velocity, which is the first image on the left.
 The result was gigant vocabulary, almost 10000 indexes, this could make the model heavy but simple, not challenging. There are other cons that we would explain later on the slides.
 
-2.The next approach we took following our intuition was to add complexity by joining notes and durations into one single index vocabulary and having an isolated vocabulary for velocities, with two corresponding embedding layers. 2nd graph
+* 2.The next approach we took following our intuition was to add complexity by joining notes and durations into one single index vocabulary and having an isolated vocabulary for velocities, with two corresponding embedding layers. 2nd graph
 
-3. After reviewing the results, we decided go further and try with one vocabulary by feature, therefore, 3. 3rd graph
+* 3. After reviewing the results, we decided go further and try with one vocabulary by feature, therefore, 3. 3rd graph
 Also trained an independent Chord model. Which results are concatenated to the main model predictions at the postproduction process adjusting the temp, the time signature and so on.
 
 [IMAGE]
