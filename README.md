@@ -74,7 +74,7 @@ The result was gigant vocabulary, almost 10000 indexes, this could make the mode
 * 3.After reviewing the results, we decided go further and try with one vocabulary by feature, therefore, 3. 3rd graph
 Also trained an independent Chord model. Which results are concatenated to the main model predictions at the postproduction process adjusting the temp, the time signature and so on.
 
-[IMAGE]
+![image](https://github.com/jacek-mcp/LoFi-music-generator/blob/main/Screenshot%202022-03-10%20at%2002.07.49.png?raw=true)
 
 As you might imagine this is not a typical classification task, we want to generate new improvised songs based on big training date of complex songs. To avoid the model predicting the exact same songs that have been trained for, we need to assess different losses and see how high is their overfitting in terms of predicting original songs and the quality of the predictions.
 
