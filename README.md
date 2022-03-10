@@ -59,6 +59,9 @@ From the Midi files we
 * Create batches of sequences of indexes of size 100.
 
 
+![alt text](https://github.com/jacek-mcp/LoFi-music-generator/blob/main/image.jpg?raw=true)
+
+
 ## Hypothesis
 The original idea was to create a LSTM model that predicts sequences of not only notes but notes and duration. However, to add more expression to the songs, we decided to also include Velocity. That was a challenge since we weren't sure how we could integrate that the the current model.
 
