@@ -59,7 +59,7 @@ From the Midi files we
 * Create batches of sequences of indexes of size 100.
 
 
-![alt text](https://github.com/jacek-mcp/LoFi-music-generator/blob/main/image.jpg?raw=true)
+![alt text](https://github.com/jacek-mcp/LoFi-music-generator/blob/main/Screenshot 2022-03-10 at 01.48.20.png?raw=true)
 
 
 ## Hypothesis
