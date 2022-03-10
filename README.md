@@ -4,12 +4,13 @@ An open-sourced Lofi hip-hop music generation project for UPC.
 Table of Contents
 =================
 
-  * [About The Project](#introduction-and-motivation)
-  * [DATASET](#dataset)
-  * [ARCHITECTURES](#architecture-and-results)
-  * [LSTM](#classifier-neural-network)
-  * [MODEL IMPROVEMENTS](#model-improvements)
-  * [Data augmentation](#data-augmentation---trial-i)
+  * [About The Project](#about-the-project)
+  * [Data & Data Processing](#data--data-processing)
+  * [Preprocessing](#preprocessing)
+  * [Hypothesis](#hypothesis)
+  * [Architectures](#architectures)
+  * [Experiments](#experiments)
+  * [Conclusions](#conclusions)
   * [End to end generator](#end-to-end-generator)
   * [Prerequisites](#prerequisites)
   * [Build & Run](#build--run)
@@ -25,13 +26,6 @@ The principal task of the project is to generate recurrently the next note of th
 Moreover, it is needed to apply some post-production process in order to tune the results with typical sounds of LoFi music such as a characteristic beat or the sound of the rain. Furthermore, it is desired to upload some of the generated tracks in a streaming platform in order to make it accesible to anyone and also to allow us to determine the evaluation of the results.
 
 Our approach proposes a generation engine made of two recurrent neural networks. One is responsible for generating the melody, second for the chords.
-
-## End to end generator
-
-The project generates unique melody and chords which are mastered by adding a typical for Lofi beats and background noises. Both chords and melody can be played by any instrument provided in [sf2](https://en.wikipedia.org/wiki/SoundFont) format. Additionally the system allows to add an inifnite (reasonable) number of post effects like rain, beats etc. in a wav format. Check [How to add your post effects & instruments](#how-to-add-your-post-effects--instruments). 
-
-The program uses the above DNNs to generate midi files with chords and melody. You can find both files in a data/midi directory. Then the midi files are changed to WAV format by [FluidSynth](https://pypi.org/project/pyFluidSynth/). You can find the melody and chords in a wav format in data/wav directory. Then the posteffects are added by [AudioSegment](https://audiosegment.readthedocs.io/en/latest/audiosegment.html) simply overlaying one track over another. 
-
 
 
 ## Data & Data Processing
@@ -49,7 +43,7 @@ MIDI  is a technical standard that describes a communications protocol, digital 
 
 ![image](https://github.com/jacek-mcp/LoFi-music-generator/blob/main/Screenshot%202022-03-10%20at%2001.48.20.png?raw=true)
 
-### Preprocessing:
+### Preprocessing
 From the Midi files we
 
 * Extracted notes, durations and velocities and tempo from midi files using music21.
@@ -64,7 +58,7 @@ From the Midi files we
 ## Hypothesis
 The original idea was to create a LSTM model that predicts sequences of not only notes but notes and duration. However, to add more expression to the songs, we decided to also include Velocity. That was a challenge since we weren't sure how we could integrate that the the current model.
 
-## Arquitectures
+## Architectures
 
 * 1.The most straightforward approach was to have a huge index vocabulary of each note, its duration and its velocity, which is the first image on the left.
 The result was gigant vocabulary, almost 10000 indexes, this could make the model heavy but simple, not challenging. There are other cons that we would explain later on the slides.
@@ -76,7 +70,7 @@ Also trained an independent Chord model. Which results are concatenated to the m
 
 ![image](https://github.com/jacek-mcp/LoFi-music-generator/blob/main/Screenshot%202022-03-10%20at%2009.48.34.png?raw=true)
 
-## Results
+## Experiments
 As you might imagine this is not a typical classification task, we want to generate new improvised songs based on big training date of complex songs. To avoid the model predicting the exact same songs that have been trained for, we need to assess different losses and see how high is their overfitting in terms of predicting original songs and the quality of the predictions.
 
 A high loss might result in absence of overfitting but produce extremely disonant results or repetitive sequences. On the other hand, a low loss might result in good results but very similar or identical to original songs, therefore the effort here is to select a loss that predicts good sounds while maintaining a low overfitting line.
@@ -111,13 +105,36 @@ While the two embeddings and three embeddings overfitting lines stay flatten.
 
 3 embeddings model: One small vocabulary for each feature proves a better result, seems to make the model hard to get repetitive as there is a diverse unique vocabulary of only notes, therefore the model have more clear decisioning on which note comes next, as there are fewer unique notes.
 
+## End to end generator
+
+The project generates unique melody and chords which are mastered by adding a typical for Lofi beats and background noises. Both chords and melody can be played by any instrument provided in [sf2](https://en.wikipedia.org/wiki/SoundFont) format. Additionally the system allows to add an inifnite (reasonable) number of post effects like rain, beats etc. in a wav format. Check [How to add your post effects & instruments](#how-to-add-your-post-effects--instruments). 
+
+The program uses the below DNNs to generate midi files with chords and melody. You can find both files in a data/midi directory. Then the midi files are changed to WAV format by [FluidSynth](https://pypi.org/project/pyFluidSynth/). You can find the melody and chords in a wav format in data/wav directory. Then the posteffects are added by [AudioSegment](https://audiosegment.readthedocs.io/en/latest/audiosegment.html) simply overlaying one track over another. 
+
+
+![image](https://github.com/jacek-mcp/LoFi-music-generator/blob/main/end-to-end-flow.drawio.png?raw=true)
+
 ## Prerequisites
 
 * Python 3.7+
 * pip
 * venv
+* [FluidSynth](https://www.fluidsynth.org/)
 
 It is strongly recommended running the project in a [Virtual env](https://docs.python.org/3/tutorial/venv.html)
+
+### FluidSynth installation
+
+Debian based linux
+ ```sh
+  sudo apt update
+  sudo apt install fluidsynth
+  ```
+MacOS
+ ```sh
+  brew install fluid-synth
+  ```
+
 
 ## Build & Run
 
