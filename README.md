@@ -116,6 +116,7 @@ While the two embeddings and three embeddings overfitting lines stay flatten.
 * Python 3.7+
 * pip
 * venv
+* [FluidSynth](https://www.fluidsynth.org/)
 
 It is strongly recommended running the project in a [Virtual env](https://docs.python.org/3/tutorial/venv.html)
 
