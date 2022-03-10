@@ -32,6 +32,34 @@ The project generates unique melody and chords which are mastered by adding a ty
 
 The program uses the above DNNs to generate midi files with chords and melody. You can find both files in a data/midi directory. Then the midi files are changed to WAV format by [FluidSynth](https://pypi.org/project/pyFluidSynth/). You can find the melody and chords in a wav format in data/wav directory. Then the posteffects are added by [AudioSegment](https://audiosegment.readthedocs.io/en/latest/audiosegment.html) simply overlaying one track over another. 
 
+
+
+## Data & Data Processing
+
+To train our models we have used:
+
+* 300 midi files (Anime and Lo-Fi songs).
+* 32 hours of music.
+* 28 Lo-fi Chords.
+* 110.630 Notes, durations and velocities.
+
+It was quite difficult to manage this data as we didn't had experience with audio processing and not prior experience manipulating MIDI files.
+
+MIDI  is a technical standard that describes a communications protocol, digital interface, and electrical connectors that connect a wide variety of electronic musical instruments, computers, and related audio devices for playing, editing, and recording music. MIDI files contains relevant information about the songs, not only the notes, but their duration, velocity, tempo, instrument, scale among much more.
+
+### Preprocessing:
+From the Midi files we
+
+* Extracted notes, durations and velocities and tempo from midi files using music21.
+
+* Normalised Duration and Velocities and Tempo accordingly to Lo-fi music genre.
+
+* Create index vocabularies. 
+* Converted sequences of notes into index sequences to feed the model.
+* Create batches of sequences of indexes of size 100.
+
+
+
 ## Prerequisites
 
 * Python 3.7+
@@ -76,27 +104,3 @@ All instruments must be in a sf2 format. Just upload them to the app/sf2 directo
 
 
 
-
-## Data & Data Processing
-
-To train our models we have used:
-
-* 300 midi files (Anime and Lo-Fi songs).
-* 32 hours of music.
-* 28 Lo-fi Chords.
-* 110.630 Notes, durations and velocities.
-
-It was quite difficult to manage this data as we didn't had experience with audio processing and not prior experience manipulating MIDI files.
-
-MIDI  is a technical standard that describes a communications protocol, digital interface, and electrical connectors that connect a wide variety of electronic musical instruments, computers, and related audio devices for playing, editing, and recording music. MIDI files contains relevant information about the songs, not only the notes, but their duration, velocity, tempo, instrument, scale among much more.
-
-### Preprocessing:
-From the Midi files we
-
-* Extracted notes, durations and velocities and tempo from midi files using music21.
-
-* Normalised Duration and Velocities and Tempo accordingly to Lo-fi music genre.
-
-* Create index vocabularies. 
-* Converted sequences of notes into index sequences to feed the model.
-* Create batches of sequences of indexes of size 100.
