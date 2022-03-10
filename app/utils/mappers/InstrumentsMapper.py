@@ -3,7 +3,7 @@ import os
 class InstrumentsMapper:
 
     def __init__(self):
-        instruments = os.listdir(os.getcwd() + '/data/sf2/')
+        instruments = os.listdir(os.getcwd() + '/app/data/sf2/')
 
         loi = {}
         for i in instruments:

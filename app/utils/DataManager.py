@@ -6,7 +6,7 @@ class DataManager:
 
     def __init__(self):
 
-        self.path = os.getcwd() + '/data/data/'
+        self.path = os.getcwd() + '/app/data/data/'
 
     # def format_and_save_final_data(self, notes_list, duration_list_formatted, velocity_list_formatted, chords_notes,
     #                                chords_duaration_formatted):

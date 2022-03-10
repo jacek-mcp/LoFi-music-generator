@@ -4,7 +4,7 @@ import os
 class EffectsMapper:
 
     def __init__(self):
-        effects = os.listdir(os.getcwd() + '/data/effects/')
+        effects = os.listdir(os.getcwd() + '/app/data/effects/')
 
         lof = {}
         for e in effects:

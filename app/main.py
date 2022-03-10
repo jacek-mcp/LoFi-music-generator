@@ -27,7 +27,7 @@ config = {
 
 }
 
-PATH = os.getcwd() + '/data/'
+PATH = os.getcwd() + '/app/data/'
 MODELS_PATH = PATH + '/models/'
 MIDI_PATH = PATH + '/midi/'
 GEN_SIZE = 200
