@@ -1,6 +1,7 @@
 import os
 
 from midi2audio import FluidSynth
+from pydub.utils import mediainfo
 
 from pydub import AudioSegment
 import fluidsynth
@@ -85,6 +86,8 @@ class MidiToWav:
 
     def post_effects(self, effects_list):
         sound = AudioSegment.from_file(self.wav_path + self.name + '.wav')
+        # bitrate = mediainfo(self.wav_path + self.name + '.wav')["bit_rate"]
+        sound = sound + 15
 
         for effect in effects_list:
             sound = sound.overlay(AudioSegment.from_file(self.effects_path +
