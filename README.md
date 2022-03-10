@@ -5,11 +5,12 @@ Table of Contents
 =================
 
   * [About The Project](#introduction-and-motivation)
-  * [DATASET](#dataset)
-  * [ARCHITECTURES](#architecture-and-results)
-  * [LSTM](#classifier-neural-network)
-  * [MODEL IMPROVEMENTS](#model-improvements)
-  * [Data augmentation](#data-augmentation---trial-i)
+  * [Data & Data Processing](#data--data-rocessing)
+  * [Preprocessing](#preprocessing)
+  * [Hypothesis](#hypothesis)
+  * [Architectures](#architectures)
+  * [Experiments](#experiments)
+  * [Conclusions](#conclusions)
   * [End to end generator](#end-to-end-generator)
   * [Prerequisites](#prerequisites)
   * [Build & Run](#build--run)
@@ -42,7 +43,7 @@ MIDI  is a technical standard that describes a communications protocol, digital 
 
 ![image](https://github.com/jacek-mcp/LoFi-music-generator/blob/main/Screenshot%202022-03-10%20at%2001.48.20.png?raw=true)
 
-### Preprocessing:
+### Preprocessing
 From the Midi files we
 
 * Extracted notes, durations and velocities and tempo from midi files using music21.
@@ -57,7 +58,7 @@ From the Midi files we
 ## Hypothesis
 The original idea was to create a LSTM model that predicts sequences of not only notes but notes and duration. However, to add more expression to the songs, we decided to also include Velocity. That was a challenge since we weren't sure how we could integrate that the the current model.
 
-## Arquitectures
+## Architectures
 
 * 1.The most straightforward approach was to have a huge index vocabulary of each note, its duration and its velocity, which is the first image on the left.
 The result was gigant vocabulary, almost 10000 indexes, this could make the model heavy but simple, not challenging. There are other cons that we would explain later on the slides.
@@ -69,7 +70,7 @@ Also trained an independent Chord model. Which results are concatenated to the m
 
 ![image](https://github.com/jacek-mcp/LoFi-music-generator/blob/main/Screenshot%202022-03-10%20at%2009.48.34.png?raw=true)
 
-## Results
+## Experiments
 As you might imagine this is not a typical classification task, we want to generate new improvised songs based on big training date of complex songs. To avoid the model predicting the exact same songs that have been trained for, we need to assess different losses and see how high is their overfitting in terms of predicting original songs and the quality of the predictions.
 
 A high loss might result in absence of overfitting but produce extremely disonant results or repetitive sequences. On the other hand, a low loss might result in good results but very similar or identical to original songs, therefore the effort here is to select a loss that predicts good sounds while maintaining a low overfitting line.
