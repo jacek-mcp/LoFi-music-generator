@@ -59,6 +59,50 @@ From the Midi files we
 * Create batches of sequences of indexes of size 100.
 
 
+## Hypothesis
+The original idea was to create a LSTM model that predicts sequences of not only notes but notes and duration. However, to add more expression to the songs, we decided to also include Velocity. That was a challenge since we weren't sure how we could integrate that the the current model.
+
+## Arquitectures
+
+1.The most straightforward approach was to have a huge index vocabulary of each note, its duration and its velocity, which is the first image on the left.
+The result was gigant vocabulary, almost 10000 indexes, this could make the model heavy but simple, not challenging. There are other cons that we would explain later on the slides.
+
+2.The next approach we took following our intuition was to add complexity by joining notes and durations into one single index vocabulary and having an isolated vocabulary for velocities, with two corresponding embedding layers. 2nd graph
+
+3. After reviewing the results, we decided go further and try with one vocabulary by feature, therefore, 3. 3rd graph
+Also trained an independent Chord model. Which results are concatenated to the main model predictions at the postproduction process adjusting the temp, the time signature and so on.
+
+[IMAGE]
+
+As you might imagine this is not a typical classification task, we want to generate new improvised songs based on big training date of complex songs. To avoid the model predicting the exact same songs that have been trained for, we need to assess different losses and see how high is their overfitting in terms of predicting original songs and the quality of the predictions.
+
+A high loss might result in absence of overfitting but produce extremely disonant results or repetitive sequences. On the other hand, a low loss might result in good results but very similar or identical to original songs, therefore the effort here is to select a loss that predicts good sounds while maintaining a low overfitting line.
+
+From the graph we observe that the model 2 is generating more repetitive songs. 80-90% of the sequences notes matches the previous sequence. While the model 1 and 3, predicts less repetitive sequences.
+
+
+In the following graph we can see the quality of each model's prediction.
+x axis: Predicted song timestep
+y axis: percentage of matching notes within the current sequence and the previous. (x-10:x) vs (x-20:x-10)
+
+[IMGage]
+
+
+The single embeddding's low repetitiveness is related to the fact that the model tends to predict exactly the same  fragments of the training data instead of improvising, overfitting.
+
+See green line, around 30% of the predicted sequences higher than 15 notes, matches sequences of the training data.
+
+While the two embeddings and three embeddings overfitting lines stay flatten.
+
+
+## Conclusions
+
+* Take out 1: Model 3 and 1 predicts less repetitive songs
+* Take out 2: Model 3 predicts predicts more original songs (less overfitting)
+
+1 Embedding model: A big vocabulary may not impact the model in terms of predicting different notes, since you have one unique embedding for all three features, it's easier for the model to overfit and predict the right sequence.
+2 embeddings model: with medium size vocabulary of notes and durations, the diversity of notes and durations is higher, as you have an index vocab of repeated notes with different durations, and therefore the model might find it harder to understand the next note. (ends up predicting one sequence over and over.)
+3 embeddings model: One small vocabulary for each feature proves a better result, seems to make the model hard to get repetitive as there is a diverse unique vocabulary of only notes, therefore the model have more clear decisioning on which note comes next, as there are fewer unique notes.
 
 ## Prerequisites
 
