@@ -49,8 +49,6 @@ MIDI  is a technical standard that describes a communications protocol, digital 
 
 ![image](https://github.com/jacek-mcp/LoFi-music-generator/blob/main/Screenshot%202022-03-10%20at%2001.48.20.png?raw=true)
 
-![alt text](https://github.com/jacek-mcp/LoFi-music-generator/blob/main/Screenshot%202022-03-10%20at%2001.48.20.png?raw=true)
-
 ### Preprocessing:
 From the Midi files we
 
