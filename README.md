@@ -126,18 +126,10 @@ Activate your venv and install all requirements.
  ```sh
   pip install -r requirements.txt
   ```
-Once done, you can run the project. You have 3 modes to chooose:
-1. Training Notes Model Mode. 
+Once done, run the project using the below command in the project's root directory.
+
 ```sh
-  python main.py train_notes
-  ```
-2. Training Chords Model Mode. 
-```sh
-  python main.py train_chords
-  ```
-3. Training Music Generation Mode. 
-```sh
-  python main.py generate_music
+  python -m app.main generate_music
   ```
 
 The 3rd mode will guide you through a generation process where you can choose a specific options of the newly generated song.
