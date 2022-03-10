@@ -47,9 +47,9 @@ It was quite difficult to manage this data as we didn't had experience with audi
 
 MIDI  is a technical standard that describes a communications protocol, digital interface, and electrical connectors that connect a wide variety of electronic musical instruments, computers, and related audio devices for playing, editing, and recording music. MIDI files contains relevant information about the songs, not only the notes, but their duration, velocity, tempo, instrument, scale among much more.
 
-![image](https://github.com//jacek-mcp/LoFi-music-generator/blob/main/Screenshot 2022-03-10 at 01.48.20.png?raw=true)
+![image](https://github.com/jacek-mcp/LoFi-music-generator/blob/main/Screenshot%202022-03-10%20at%2001.48.20.png?raw=true)
 
-![alt text](https://github.com//jacek-mcp/LoFi-music-generator/blob/main/Screenshot 2022-03-10 at 01.48.20.png?raw=true)
+![alt text](https://github.com/jacek-mcp/LoFi-music-generator/blob/main/Screenshot%202022-03-10%20at%2001.48.20.png?raw=true)
 
 ### Preprocessing:
 From the Midi files we
