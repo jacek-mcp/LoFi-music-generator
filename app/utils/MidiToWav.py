@@ -87,7 +87,7 @@ class MidiToWav:
     def post_effects(self, effects_list):
         sound = AudioSegment.from_file(self.wav_path + self.name + '.wav')
         # bitrate = mediainfo(self.wav_path + self.name + '.wav')["bit_rate"]
-        sound = sound + 15
+        sound = sound + 10
 
         for effect in effects_list:
             sound = sound.overlay(AudioSegment.from_file(self.effects_path +
